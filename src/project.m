@@ -1,4 +1,4 @@
-% Main File for launching project.
+% Main File for launching project 2.
 
 CV = ComputerVision.ComputerVisionInterface();
 Pathing = PathExtraction.PathExtractionInterface(CV);
