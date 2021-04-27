@@ -1,0 +1,1 @@
+% for image stuff: for sim use webcam, for real use usb_cam topic
