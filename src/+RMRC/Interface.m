@@ -1,0 +1,2 @@
+classdef Interface < handle
+end
