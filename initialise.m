@@ -4,3 +4,5 @@
 clear all
 close all
 addpath(genpath(pwd), '-begin');
+
+workspace = pwd;
