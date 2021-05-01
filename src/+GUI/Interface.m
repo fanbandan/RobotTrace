@@ -7,11 +7,11 @@ classdef Interface < handle
         RMRCI RMRC.Interface;
     end
     methods (Access = public)
-        function self = GUIInterace(move)
-            self.Move = move;
+        function self = GUIInterace(rmrci)
+            self.RMRCI = rmrci;
         end
         function Launch(self)
-            %Launches Matlab .mlapp s
+            %Launches Matlab .mlapp gui.
         end
     end
     methods (Access = private)

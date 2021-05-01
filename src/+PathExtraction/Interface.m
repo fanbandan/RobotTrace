@@ -8,7 +8,18 @@ classdef Interface < handle
         CVI ComputerVision.Interface
     end
     methods (Access = public)
-        function self = PathExtractionInterface()
+        function self = Interface(cvi)
+            self.CVI = cvi;
+        end
+        function [x] = GetTrajectory(self)
+            %GetTrajectory returns the game path in cartesian coordinates.
+        end
+        function [xDot] = GetXDot(self)
+            %GetXDot returns the velocity path for RMRC.
+            %   The game path derivate.
+            x = GetTrajectory(self);
+            deltaTime = 0.1;
+            xDot = diff(x) / deltaTime;
         end
     end
     methods (Access = private)
