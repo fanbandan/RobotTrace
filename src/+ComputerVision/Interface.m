@@ -17,17 +17,17 @@ classdef Interface < handle
     methods (Access = public)
         %Transformation Matrices
         %   Derived from AR Tags
-        function T = GetRobotGameTransformationMatrix(self)
+        function T = GetRobot2GameTransformationMatrix(self)
         end
-        function T = GetGameRobotTransformationMatrix(self)
+        function T = GetGame2RobotTransformationMatrix(self)
         end
-        function T = GetCameraGameTransformationMatrix(self)
+        function T = GetCamera2GameTransformationMatrix(self)
         end
-        function T = GetGameCameraTransformationMatrix(self)
+        function T = GetGame2CameraTransformationMatrix(self)
         end
-        function T = GetRobotCameraTransformationMatrix(self)
+        function T = GetRobot2CameraTransformationMatrix(self)
         end
-        function T = GetCameraRobotTransformationMatrix(self)
+        function T = GetCamera2RobotTransformationMatrix(self)
         end
     end
     methods (Access = private)
