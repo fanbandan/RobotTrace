@@ -1,36 +1,49 @@
 
 clf
 CVI = ComputerVision.Interface();
-%%
-imgMask = imread([workspace, '\data\path_images\path_unproccessed (3).bmp']);
+%% 1. Get image mask & AR Tag
+imgMask = imread([workspace, '\data\path_images\path_unproccessed (1).bmp']);
+% px = -size(imgMask,2)/2;
+% py = 120;
+px = size(imgMask,2)/2;
+py = size(imgMask,1)/2;
+f = 180;
+AR_Q = Quaternion(0.00,[0,1,0]);
+AR_P = [0,0,0.6];
 
-%%
-% % img = 4*peaks(720,1080)+randn(720,1080);
-% [U,V] = meshgrid(1:1080,1:720);
-% % img = peaks(U);
-% % img = sin(rand*U/10+rand/10)+sin(rand*V/10+rand/10) + ...
-% %     sin(rand/5*V+rand)+sin(rand/5*U+rand);
-% pk = peaks(1080);
-% img = img + pk(1:720,:);
-% % img = img(1:720,:);
-% imgMask = logical(img>=0.5);
-%%
-% Ft = ones(3,3)/3^2;
-a = 3;
-Ft = ones(a,a)/a^2;
-% Ft = [-1,-1,-1;-1,8,-1;-1,-1,-1];
-imgFt = conv2(imgMask,Ft,'same'); 
-imgFt = logical(imgFt >= 1);
+%% 2. Convert to X Y Z cartesian
+[pixelY,pixelX,~] = find(imgMask);
 
-[pty,ptx,~] = find(imgMask);
-ptz = ones(size(ptx));
-points = [ptx,pty,ptz];
+u1 = px+(f*AR_P(1))/(AR_P(3));
+v1 = py+(f*AR_P(2))/(AR_P(3));
+zPlanePoint = [u1,v1,AR_P(3)];
+zPlaneNormal = Quaternion2Normal(AR_Q)';
+%%
+points = NaN(length(pixelX),3);
+
+for i = 1:length(pixelX)
+    Z = GetZ(pixelX(i),pixelY(i),zPlaneNormal,zPlanePoint);
+    X = (Z/f) * (pixelX(i) - px);
+    Y = (Z/f) * (pixelY(i) - py);
+    points(i,:) = [X,Y,Z];
+end
+plot3(points(:,1),points(:,2),points(:,3),'*');
+
+%% 3. Create Point Cloud
+
 pcloud = pointCloud(points);
-pcloud = pcdenoise(pcloud);
-pcloud = pcdownsample(pcloud,'gridAverage',20);
+% pcloud = pcdenoise(pcloud);
+pcloud = pcdownsample(pcloud,'nonuniformGridSample',200);
 points2 = pcloud.Location;
 
-p_start_guess = [915,650,1];
+pixel_guess = [915,629];
+p_start_guess = zeros(1,3);
+p_start_guess(3) = GetZ(pixel_guess(1),pixel_guess(2),zPlaneNormal,zPlanePoint);
+p_start_guess(1) = (p_start_guess(3)/f) * (pixel_guess(1) - px);
+p_start_guess(2) = (p_start_guess(3)/f) * (pixel_guess(2) - py);
+% [~,idx] = max(points2(:,1));
+% p_start_guess = points2(idx,:);
+% p_start_guess = [-8.8,-6.2,-18.2];
 
 P = p_start_guess;
 L = points2;
@@ -38,7 +51,8 @@ R = NaN(length(points2),3);
 i = 1;
 while ~isempty(L)
     [dist,I] = min(pdist2(P,L));
-    if dist > 40
+    if dist > 2
+        i + 1;
         break
     end
     PN = L(I,:);
@@ -47,7 +61,7 @@ while ~isempty(L)
     L(I,:) = [];
     P = PN;
 end
-R = R(1:i,:);
+R = R(1:(i-1),:);
 
 SX = R(:,1);
 SY = R(:,2);
@@ -56,30 +70,21 @@ SZ = R(:,3);
 figure(10)
 plot(R(:,1),R(:,2))
 
-path_idx = zeros(1,length(points2));
-
-for i = 1:(length(points2)-1)
-    p1 = points2(i,:);
-    distances = vecnorm((p1-points2((i+1):end,:))');
-    [~,p2_idx] = min(distances);
-    path_idx(i+1) = p2_idx;
-end
-
 figure(1);
 clf;
 subplot(2,1,1) 
 imagesc(imgMask);
 axis image;
 colorbar;
-hold on;
-plot(movmean(SX,2),movmean(SY,2),'-r')
+% hold on;
+% plot(movmean(SX,2),movmean(SY,2),'-r')
 
 subplot(2,1,2) 
-imagesc(imgFt);
-axis image;
-colorbar;
+plot3(points(:,1),points(:,2),points(:,3),'*')
 hold on;
-plot(points2(:,1),points2(:,2),'.r')
+plot3(points2(:,1),points2(:,2),points2(:,3),'*')
+plot3(p_start_guess(:,1),p_start_guess(:,2),p_start_guess(:,3),'o')
+% plot(points2(:,1),points2(:,2),'.r')
 
 figure(2);
 clf;
@@ -97,18 +102,58 @@ X = zeros(size(Y));
 plane = [X(:),Y(:),Z(:),ones(size(X(:)))];
 
 % TC2G = CVI.GetCamera2GameTransformationMatrix();
-TC2G = transl(3,0,0)*trotz(pi/6)*troty(pi/10);
+TC2G = transl(3,0,0)*trotz(pi/6);%*troty(pi/10);
 planeT = (TC2G*plane')';
 
-figure(2);
+figure(8);
+surf_h = surf( ...
+    reshape(plane(:,1),size(X)), ...
+    reshape(plane(:,2),size(Y)), ...
+    reshape(plane(:,3),size(Z)) ...
+    );
+alpha(0.5);
+hold on;
 surf_h = surf( ...
     reshape(planeT(:,1),size(X)), ...
     reshape(planeT(:,2),size(Y)), ...
     reshape(planeT(:,3),size(Z)) ...
     );
 alpha(0.5);
-hold on;
 
 axis equal
 trplot(transl(0,0,0), 'frame', 'Base')
 trplot(TC2G, 'frame', 'AR')
+
+%%
+clf
+q = Quaternion(pi/4,[0,1,0]);
+normal = Quaternion2Normal(q)';
+
+CreateSurface(normal,[0,0,3])
+Z = GetZ(0,0,normal,[0,0,3])
+axis equal
+hold on;
+% trplot(transl(0,0,0))
+q.plot();
+
+function normal = Quaternion2Normal(quaternion)
+    normal = quaternion*[0,0,1];
+end
+
+function Z = GetZ(u,v,normal,point)
+    x = u;
+    y = v;
+    Z = point(3) + ( ... 
+        conj(normal(1))*(point(1) - x) + conj(normal(2))*(point(2) - y) ...
+        ) / (conj(normal(3)));
+end
+
+function CreateSurface(normal,point)
+w = null(normal); % Find two orthonormal vectors which are orthogonal to v
+[P,Q] = meshgrid(-500:50:500); % Provide a gridwork (you choose the size)
+X = point(1)+w(1,1)*P+w(1,2)*Q; % Compute the corresponding cartesian coordinates
+Y = point(2)+w(2,1)*P+w(2,2)*Q; %   using the two vectors in w
+Z = point(3)+w(3,1)*P+w(3,2)*Q;
+hold on
+surf(X,Y,Z);
+end
