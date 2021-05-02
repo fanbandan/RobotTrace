@@ -4,7 +4,7 @@ classdef Vision < handle
     end
     methods (Access = private)
         function self = Vision()
-            %Constructor
+            %Constructor -----------------------------Do I need stuff here?
         end
         function maskedRGBImage = colourMask(I)
             
