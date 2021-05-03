@@ -6,7 +6,7 @@ classdef Vision < handle
         function self = Vision()
             %Constructor -----------------------------Do I need stuff here?
         end
-        function maskedRGBImage = colourMask(I)
+        function maskedRGBImage = colourMask(RGB)
             
             % Convert RGB image to chosen color space
             I = rgb2hsv(RGB);
