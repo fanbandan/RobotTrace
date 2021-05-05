@@ -12,12 +12,10 @@ message_generation
 roscpp
 sensor_msgs
 std_msgs
-roslib # Needed for ros::package::getPath
+roslib
 geometry_msgs
 nav_msgs
 tf
-cv_bridge
-image_transport
         )
 
 catkin_package(    #  INCLUDE_DIRS include
@@ -27,13 +25,11 @@ catkin_package(    #  INCLUDE_DIRS include
 LIBRARIES
 INCLUDE_DIRS
 CATKIN_DEPENDS
-cv_bridge
-image_transport
 AlvarMarkers
 roscpp
 sensor_msgs
 std_msgs
-tf)
+)
 
 add_executable(main
         src/main.cpp src/ar_convert.cpp
