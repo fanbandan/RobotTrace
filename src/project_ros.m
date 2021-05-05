@@ -51,7 +51,7 @@ function project_ros()
     end
     %% Get image from camera
     camMsg = receive(camSub,0.1); %Maybe change wait amount?--------------
-    camData = camMsg(1).Data.image; %it's either image or data
+    camData = creadImage(camMsg); %it's either image or data
     %for testing
 %     imshow(camData)
     %%
