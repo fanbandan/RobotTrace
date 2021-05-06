@@ -5,27 +5,38 @@ CVI = ComputerVision.Interface();
 imgMask = imread([workspace, '\data\path_images\path_unproccessed (1).bmp']);
 % px = -size(imgMask,2)/2;
 % py = 120;
-px = size(imgMask,2)/2;
-py = size(imgMask,1)/2;
-f = 180;
-AR_Q = Quaternion(0.00,[0,1,0]);
+u0 = size(imgMask,2)/2;
+v0 = size(imgMask,1)/2;
+f = 1;
+AR_Q = Quaternion(0.0,[0,1,0]);
 AR_P = [0,0,0.6];
+
+pw = 1;
+ph = 1;
+
+C = [f/pw,  0,      u0;
+    0,      f/ph,   v0;
+    0,      0,      1;];
 
 %% 2. Convert to X Y Z cartesian
 [pixelY,pixelX,~] = find(imgMask);
 
-u1 = px+(f*AR_P(1))/(AR_P(3));
-v1 = py+(f*AR_P(2))/(AR_P(3));
-zPlanePoint = [u1,v1,AR_P(3)];
+p = C*AR_P';
+zPlanePoint = p';
 zPlaneNormal = Quaternion2Normal(AR_Q)';
 %%
 points = NaN(length(pixelX),3);
 
+[X,Y] = meshgrid(1:10:540,1:10:540);
+pixelX = X(:);
+pixelY = Y(:);
+
 for i = 1:length(pixelX)
-    Z = GetZ(pixelX(i),pixelY(i),zPlaneNormal,zPlanePoint);
-    X = (Z/f) * (pixelX(i) - px);
-    Y = (Z/f) * (pixelY(i) - py);
-    points(i,:) = [X,Y,Z];
+    points(i,:) = Pixel2World(pixelX(i),pixelY(i),C,zPlaneNormal,zPlanePoint)';
+%     Z = GetZ(pixelX(i),pixelY(i),zPlaneNormal,zPlanePoint);
+%     X = (Z/f) * (pixelX(i) - u0);
+%     Y = (Z/f) * (pixelY(i) - v0);
+%     points(i,:) = [X,Y,Z];
 end
 plot3(points(:,1),points(:,2),points(:,3),'*');
 
@@ -37,10 +48,11 @@ pcloud = pcdownsample(pcloud,'nonuniformGridSample',200);
 points2 = pcloud.Location;
 
 pixel_guess = [915,629];
-p_start_guess = zeros(1,3);
-p_start_guess(3) = GetZ(pixel_guess(1),pixel_guess(2),zPlaneNormal,zPlanePoint);
-p_start_guess(1) = (p_start_guess(3)/f) * (pixel_guess(1) - px);
-p_start_guess(2) = (p_start_guess(3)/f) * (pixel_guess(2) - py);
+p_start_guess = Pixel2World(pixel_guess(1),pixel_guess(2),C,zPlaneNormal,zPlanePoint)';
+% p_start_guess = zeros(1,3);
+% p_start_guess(3) = GetZ(pixel_guess(1),pixel_guess(2),zPlaneNormal,zPlanePoint);
+% p_start_guess(1) = (p_start_guess(3)/f) * (pixel_guess(1) - u0);
+% p_start_guess(2) = (p_start_guess(3)/f) * (pixel_guess(2) - v0);
 % [~,idx] = max(points2(:,1));
 % p_start_guess = points2(idx,:);
 % p_start_guess = [-8.8,-6.2,-18.2];
@@ -105,39 +117,45 @@ plane = [X(:),Y(:),Z(:),ones(size(X(:)))];
 TC2G = transl(3,0,0)*trotz(pi/6);%*troty(pi/10);
 planeT = (TC2G*plane')';
 
-figure(8);
-surf_h = surf( ...
-    reshape(plane(:,1),size(X)), ...
-    reshape(plane(:,2),size(Y)), ...
-    reshape(plane(:,3),size(Z)) ...
-    );
-alpha(0.5);
-hold on;
-surf_h = surf( ...
-    reshape(planeT(:,1),size(X)), ...
-    reshape(planeT(:,2),size(Y)), ...
-    reshape(planeT(:,3),size(Z)) ...
-    );
-alpha(0.5);
+% figure(8);
+% surf_h = surf( ...
+%     reshape(plane(:,1),size(X)), ...
+%     reshape(plane(:,2),size(Y)), ...
+%     reshape(plane(:,3),size(Z)) ...
+%     );
+% alpha(0.5);
+% hold on;
+% surf_h = surf( ...
+%     reshape(planeT(:,1),size(X)), ...
+%     reshape(planeT(:,2),size(Y)), ...
+%     reshape(planeT(:,3),size(Z)) ...
+%     );
+% alpha(0.5);
 
-axis equal
-trplot(transl(0,0,0), 'frame', 'Base')
-trplot(TC2G, 'frame', 'AR')
+% axis equal
+% trplot(transl(0,0,0), 'frame', 'Base')
+% trplot(TC2G, 'frame', 'AR')
 
 %%
-clf
+% clf
 q = Quaternion(pi/4,[0,1,0]);
 normal = Quaternion2Normal(q)';
 
-CreateSurface(normal,[0,0,3])
-Z = GetZ(0,0,normal,[0,0,3])
-axis equal
-hold on;
-% trplot(transl(0,0,0))
-q.plot();
+% CreateSurface(normal,[0,0,3])
+% Z = GetZ(0,0,normal,[0,0,3])
+% axis equal
+% hold on;
+% % trplot(transl(0,0,0))
+% q.plot();
 
 function normal = Quaternion2Normal(quaternion)
     normal = quaternion*[0,0,1];
+end
+
+function world = Pixel2World(u,v,C,normal,point)
+    w = GetZ(u,v,normal,point);
+    pixel = [u;v;w];
+    world = inv(C)*pixel;
 end
 
 function Z = GetZ(u,v,normal,point)
