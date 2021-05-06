@@ -10,7 +10,7 @@ function project_ros()
     camSub = rossubscriber('/usb_cam/image_raw');
     pause(1)
     %% Initialise AR Tag ROS Subscriber
-    tagSub = rossubscriber('/ar_pose_marker');
+    tagSub = rossubscriber('/tags');
     pause(1)
     %% Arduino eStop
     arduinoMsg = receive(arduinoSub,0.1);
@@ -21,7 +21,7 @@ function project_ros()
     %Need to do a check before continuing after eStop----------------------
     %% AR Tag detection
     tagMsg = receive(tagSub ,5); %Set to 5 second wait currently ----
-    tagData = tagMsg(1).Data;
+    tagData = tagMsg(1).Poses;
     tagSize = size(tagData);
     tagSize = tagSize(2);
     if tagSize > 1
