@@ -38,14 +38,16 @@ classdef ResMotion < handle
         W = diag([1 1 1 0.1 0.1 0.1]); % Weighting matrix for the velocity vector
     end
     methods (Access = public)
-        function self = ResMotion(x_dot, traj, dobot)
+        function self = ResMotion(x_dot, traj, dobot, t, delta_t)
             self.xDot = x_dot;
             self.dobot = dobot;
-            self.traj = traj;
+            self.traj = traj; % I need trajectory points here (x, y, z, roll, pitch and yaw see lab 9 for format)
+            self.t = t;
+            self.deltaT = delta_t;
         end
         function qMat = RateControl(self)
             self.T =  [rpy2r(self.theta(1,1), self.theta(2,1), self.theta(3,1)) self.x(:,1);zeros(1,3) 1];            % Create transformation of first point and angle
-            self.qMatrix(1,:) = self.dobot.model.ikcon(self.T, self.q0); % Replace ikcon               % Solve joint angles to achieve first waypoint
+            self.qMatrix(1,:) = self.dobot.model.ikcon(self.T, self.q0); % Replace ikcon              % Solve joint angles to achieve first waypoint
             
             % Track the trajectory with RMRC
             for i = 1:self.steps-1
@@ -69,7 +71,7 @@ classdef ResMotion < handle
                 end
                 
                 invJ = inv(self.J' * self.J + self.lambda * eye(3)) * self.J';
-                self.qdot(i,:) = (invJ * self.xDot)'; % Solve the RMRC equation
+                self.qdot(i,:) = (invJ * self.xDot)'; 
                 for j = 1:3 % Loop through joints 1 to 3
                     if self.qMatrix(i, j) + self.deltaT * self.qdot(i, j) < self.dobot.model.qlim(j, 1) % If next joint angle is lower than joint limit...
                         self.qdot(i, j) = 0; % Stop the motor
@@ -83,6 +85,7 @@ classdef ResMotion < handle
             end
         end
         % How do I move the dobot???
+        self.qMatrix = qMat;
     end
     methods (Access = private)
         
