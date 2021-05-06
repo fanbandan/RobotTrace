@@ -2,23 +2,12 @@ function project_ros()
     % for image stuff: for sim use webcam, for real use usb_cam topic
     %% Ros Setup
     rosinit
-    %% Initialise Arduino ROS Subscriber 
-    % Running this in rosserial might cause errors since dobot uses it too
-    arduinoSub = rossubscriber('/pushed');
-    pause(1)
     %% Initialse Camera ROS Subscriber
     camSub = rossubscriber('/usb_cam/image_raw');
     pause(1)
     %% Initialise AR Tag ROS Subscriber
     tagSub = rossubscriber('/tags');
     pause(1)
-    %% Arduino eStop
-    arduinoMsg = receive(arduinoSub,0.1);
-    arduinoData = arduinoMsg(1).Data;
-    if arduinoData == 1
-        return
-    end
-    %Need to do a check before continuing after eStop----------------------
     %% AR Tag detection
     tagMsg = receive(tagSub ,5); %Set to 5 second wait currently ----
     tagData = tagMsg(1).Poses;
@@ -50,10 +39,8 @@ function project_ros()
         robot2WirePose = transl(wireTag.position.x, wireTag.position,y, wireTag.position.z)*wireRotm/transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm;
     end
     %% Get image from camera
-    camMsg = receive(camSub,0.1); %Maybe change wait amount?--------------
-    camData = creadImage(camMsg); %it's either image or data
-    %for testing
-%     imshow(camData)
+    camMsg = receive(camSub,0.1);
+    camData = readImage(camMsg);
     %%
     rosshutdown
 end
