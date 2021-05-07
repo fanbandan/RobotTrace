@@ -1,10 +1,12 @@
 classdef Dobot < RMRC.Robot
     %LinearUR5 Summary of this class goes here
     %   Detailed explanation goes here
+    properties (Access = public)
+        qlim;
+    end
     properties (Access = private)
         d;
         a;
-        qlim;
     end
     methods
         function self = Dobot()
@@ -14,16 +16,16 @@ classdef Dobot < RMRC.Robot
             
             d = zeros(1,5);
             a = zeros(1,5);
-            qlim = zeros(2,5);
+            qlim = zeros(5,2);
             
             d(2) = 0.08;
             a(3) = 0.135;
             a(4) = 0.160;
-            qlim(:,1) = [0,1];
-            qlim(:,2) = deg2rad([-135   135]);
-            qlim(:,3) = deg2rad([5      80]);
-            qlim(:,4) = deg2rad([-5     85]);
-            qlim(:,5) = deg2rad([-85    85]);
+            qlim(1,:) = [0,1];
+            qlim(2,:) = deg2rad([-135   135]);
+            qlim(3,:) = deg2rad([5      80]);
+            qlim(4,:) = deg2rad([-5     85]);
+            qlim(5,:) = deg2rad([-85    85]);
             
             self.d = d;
             self.a = a;
@@ -125,7 +127,7 @@ classdef Dobot < RMRC.Robot
             error = zeros(T_sz, 1);
             exitflag = zeros(T_sz, 1);
             
-            problem.x0 = self.GetPos();
+            problem.x0 = zeros(1,5);
             if nargin > 2
                 % user passed initial joint coordinates
                 problem.x0 = q0;
@@ -134,8 +136,8 @@ classdef Dobot < RMRC.Robot
                 'Algorithm', 'active-set', ...
                 'Display', 'off'); % default options for ikcon
             
-            problem.lb = self.qlim(1,:)';
-            problem.ub = self.qlim(2,:)';
+            problem.lb = self.qlim(:,1);
+            problem.ub = self.qlim(:,2);
             problem.solver = 'fmincon';
             
             reach = sum(abs([self.a, self.d]));
@@ -175,16 +177,16 @@ classdef Dobot < RMRC.Robot
         function [valid,q] = verifyQ(self, q)
             valid = true;
             for i = 1:length(q)
-                if q(i) < self.qlim(1,i)
+                if q(i) < self.qlim(i,1)
                     %q is less than q min.
                     %outside of parameters!!!
-                    q(i) = self.qlim(1,i);
+                    q(i) = self.qlim(i,1);
                     valid = false;
                 end
-                if q(i) > self.qlim(2,i)
+                if q(i) > self.qlim(i,2)
                     %q is larger than q max;
                     %outside of parameters!!!
-                    q(i) = self.qlim(2,i);
+                    q(i) = self.qlim(i,2);
                     valid = false;
                 end
             end
