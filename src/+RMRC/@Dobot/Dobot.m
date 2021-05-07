@@ -88,9 +88,9 @@ classdef Dobot < RMRC.Robot
             self.Model.delay = 0.0;
         end
         function Animate(self, q)
-            q = [q(1:4), 0, q(5)];
-            q(5) = pi - q(4);
-            q(4) = pi/2 - q(3) + q(4);
+            q = [q(:,1:4), zeros(size(q,1),1), q(:,5)];
+            q(:,5) = pi - q(:,4);
+            q(:,4) = pi/2 - q(:,3) + q(:,4);
             self.Model.animate(q);
         end
         function q = GetPos(self)
