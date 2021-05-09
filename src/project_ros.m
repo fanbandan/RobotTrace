@@ -2,12 +2,25 @@ function project_ros()
     % for image stuff: for sim use webcam, for real use usb_cam topic
     %% Ros Setup
     rosinit
+    %% Create and initialise robot
+    dobot = DobotMagician();
+    dobot.SetRobotOnRail(true);
+    dobot.InitialiseRobot();
+    % Initialise Rail
+    [railStatusPublisher, railStatusMsg] = rospublisher('/dobot_magician/target_rail_status');
+    railStatusMsg.Data = true;
+    send(railStatusPublisher, railStatusMsg);
+    [railPosPub, railPosMsg] = rospublisher('/dobot_magician/target_rail_position');
+    %%
+    position = 0.5;
+    railPosMsg.Data = position;
+    send(railPosPub, railPosMsg);
     %% Initialse Camera ROS Subscriber
     camSub = rossubscriber('/usb_cam/image_raw');
-    pause(1)
+    pause(1);
     %% Initialise AR Tag ROS Subscriber
     tagSub = rossubscriber('/tags');
-    pause(1)
+    pause(1);
     %% AR Tag detection
     tagMsg = receive(tagSub ,5); %Set to 5 second wait currently ----
     tagData = tagMsg(1).Poses;
@@ -21,26 +34,27 @@ function project_ros()
                 wireTag = tags(i).pose.pose;
             elseif tags(i).Id == 2 %--------------------------------
                 robotTag = tags(i).pose.pose;
-            end
-        
-        end
-        
-        %Pose Calculation - Please check this
-%        quat = [x y z w]; %CHECK THIS IS CORRECT FORMAT
-        wireRotm = quat2rotm([wireTag.orientation.x wireTag.orientation.y wireTag.orientation.z wireTag.orientation.w])
-        wireRotm = [wireRotm; ones(1,3)]
-        wireRotm = [wireRotm ones(4,1)]
-        robotRotm = quat2rotm([robotTag.orientation.x robotTag.orientation.y robotTag.orientation.z robotTag.orientation.w])
-        robotRotm = [robotRotm; ones(1,3)]
-        robotRotm = [robotRotm ones(4,1)]
-        
-        %%Find the transforms from each ar tag------------------------
-        wire2RobotPose = transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm/transl(wireTag.position.x, wireTag.position.y, wireTag.position.z)*wireRotm;
-        robot2WirePose = transl(wireTag.position.x, wireTag.position,y, wireTag.position.z)*wireRotm/transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm;
+            end   
+        end    
     end
     %% Get image from camera
     camMsg = receive(camSub,0.1);
-    camData = readImage(camMsg);
+    image = readImage(camMsg);
+    %% Vision
+    compV = ComputerVision.Interface();
+    edges = compV.GetPathPixel(image);
+    %% Path Extraction
+    
+    %% Run RMRC
+    
+    %% Move robot
+    sz = size(qMatrix,1);
+    for i = 1:sz
+        joint_target = [qMatrix(i,2) qMatrix(i,3) qMatrix(i,4) qMatrix(i,5)];
+        dobot.MoveRailToPosition(qMatrix(i,1));
+        dobot.PublishTargetJoint(joint_target);
+        pause(0.05);
+    end
     %%
     rosshutdown
 end
