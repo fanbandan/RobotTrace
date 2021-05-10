@@ -5,6 +5,7 @@ end
 properties (Access = private)
     debug logical = false
     pCloud;
+    pCloudSource;
     pathPoints;
     spline;
     bounds;
@@ -14,7 +15,8 @@ methods (Access = public)
         self.debug = debug;
     end
     function UpdatePointCloud(self, x, y, z)
-        self.pCloud = pointCloud([x,y,z]);
+        self.pCloud = pointCloud([x;y;z]');
+        self.pCloudSource = self.pCloud;
     end
     function ShowPointCloud(self, h)
         figure(h);
@@ -28,8 +30,15 @@ methods (Access = public)
         %DownsamplePointCloud - downsamples the point cloud for faster
         % trajectory construction. pointNumber sets the final number of
         % points.
-        self.pCloud = pcdenoise(self.pCloud,'Threshold',1.2,'NumNeighbors',5);
-        self.pCloud = pcdownsample(self.pCloud,'nonuniformGridSample',pointNumber);
+        self.pCloud = pcdenoise(self.pCloudSource,'Threshold',0.8,'NumNeighbors',8);
+        percentage = pointNumber/length(self.pCloud.Location);
+        if percentage > 1
+            percentage = 1;
+        end
+        self.pCloud = pcdownsample(self.pCloud,'random',percentage);
+%         if self.debug
+            size(self.pCloud.Location)
+%         end
     end
     function GeneratePath(self, start_guess, max_distance)
         P = start_guess;                    % Start location of trajectory
@@ -83,7 +92,7 @@ methods (Access = public)
         plot3(self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:));
         plot3(x,y,z);
     end
-    function points = GetSplinePoints(self,samples)
+    function points = GetSplinePoints(self, samples)
         t = linspace(self.bounds(1),self.bounds(2), samples);
         
         x = fnval(self.spline(1),t);
