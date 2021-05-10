@@ -7,15 +7,15 @@ classdef Interface < handle
         vision Vision
     end
     methods (Access = public)
-        function self = Interface()
+        function self = Interface()            
+            self.vision = ComputerVision.Vision;
         end
         function BWImage = GetPathPixel(self, image)
             %GetPathPixel returns a mask of pixels containing copper pipe.
             %   [1] pixel at uv coordinate contains copper pipe.
             %   [0] pixel at uv coordinate does not contain copper pipe.
-            vision = Vision;
-            maskedRGBImage = vision.colourMask(image);
-            edgeImage = vision.edgeDetection(maskedRGBImage);
+            maskedRGBImage = self.vision.colourMask(image);
+            edgeImage = self.vision.edgeDetection(maskedRGBImage);
             BWImage = edgeImage;
         end
     end
