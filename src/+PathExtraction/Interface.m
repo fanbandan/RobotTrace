@@ -4,7 +4,7 @@ classdef Interface < handle
     %   Creates cartesian path from an image in path coordinate frame.
     properties (Access = public)
     end
-    properties (Access = private)
+    properties %(Access = private)
         CVI ComputerVision.Interface
         Path PathExtraction.Path
         debug logical = false;
@@ -13,8 +13,8 @@ classdef Interface < handle
         zPoint;
     end
     methods (Access = public)
-        function self = Interface(cvi, debug)
-            self.CVI = cvi;
+        function self = Interface( debug)
+%             self.CVI = cvi;
             self.debug = debug;
             self.Path = PathExtraction.Path(debug);
         end
@@ -23,7 +23,7 @@ classdef Interface < handle
             self.zPoint = zPoint;
             [pixelY,pixelX,~] = find(image); % check x and y!
             
-            points = Pixels2Points(pixelX, pixelY, CameraMatrix);
+            points = self.Pixels2Points(pixelX, pixelY, CameraMatrix);
             self.Path.UpdatePointCloud(points(1,:),points(2,:),points(3,:));
         end
         function [x] = GetTrajectory(self)
@@ -38,19 +38,19 @@ classdef Interface < handle
 %         end
     end
     methods (Access = private)
-        function points = Pixels2Points(uMatrix,vMatrix,C)
+        function points = Pixels2Points(self, uMatrix, vMatrix, C)
             points = NaN(3,length(uMatrix));
             invC = inv(C);
             for i = 1:length(uMatrix)
                 points(:,i) = self.Pixel2Point(uMatrix(i),vMatrix(i),invC);
             end
         end
-        function point = Pixel2Point(u,v,invC)
-            w = PixelDepth(u,v);
+        function point = Pixel2Point(self, u, v, invC)
+            w = self.PixelDepth(u,v);
             pixel = [u;v;w];
             point = invC*pixel;
         end        
-        function Z = PixelDepth(u,v)
+        function Z = PixelDepth(self, u, v)
             x = u;
             y = v;
             Z = self.zPoint(3) + ( ...
