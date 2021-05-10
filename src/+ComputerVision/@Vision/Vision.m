@@ -2,7 +2,7 @@ classdef Vision < handle
     properties (SetAccess = private)
         
     end
-    methods (Access = private)
+    methods (Access = public)
         function self = Vision()
             
             %Constructor -----------------------------Do I need stuff here?
