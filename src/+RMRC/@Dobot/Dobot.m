@@ -20,7 +20,9 @@ classdef Dobot < RMRC.Robot
             
             d(2) = 0.08;
             a(3) = 0.135;
+            % 0.147
             a(4) = 0.160;
+            
             qlim(1,:) = [0,1];
             qlim(2,:) = deg2rad([-135   135]);
             qlim(3,:) = deg2rad([5      80]);
@@ -54,14 +56,14 @@ classdef Dobot < RMRC.Robot
             L(5).qlim = deg2rad([-180   180]);
             L(6).qlim = deg2rad([-85    85]);
             
-            L(2).offset = pi;
+%             L(2).offset = pi;
             L(3).offset = pi/2;
             L(6).offset = pi;
             
             self.Model = SerialLink(L,'name',name);
             
             % Rotate robot to the correct orientation
-            self.Model.base = self.Model.base * trotx(-pi/2); % * troty(pi/2);
+            self.Model.base = self.Model.base * trotx(-pi/2) * troty(pi/2);
         end
         function PlotAndColourRobot(self, workspace, q)
         %PlotAndColourRobot
@@ -109,8 +111,8 @@ classdef Dobot < RMRC.Robot
                         
             l = self.a(3)*sin(q(3)) + self.a(4)*cos(q(4)) + self.a(5);
             Z = self.d(2) + self.a(3)*cos(q(3)) - self.a(4)*sin(q(4));
-            Y = q(1) + l*sin(q(2));
-            X = l*cos(q(2));
+            Y = l*cos(q(2));
+            X = q(1) + l*sin(q(2));
             Rz = q(2) + q(5);
             Ry = 0;
             Rx = 0;
@@ -167,8 +169,8 @@ classdef Dobot < RMRC.Robot
             
             J = zeros(6,5);
             
-            J(1,:) = [0,-1*sin(q(2)),self.a(3)*cos(q(2))*cos(q(3)),-self.a(4)*cos(q(2))*sin(q(4)),0];
-            J(2,:) = [1,l*cos(q(2)),self.a(3)*sin(q(2))*cos(q(3)),-self.a(4)*sin(q(2))*sin(q(4)),0];
+            J(1,:) = [1,l*cos(q(2)),self.a(3)*sin(q(2))*cos(q(3)),-self.a(4)*sin(q(2))*sin(q(4)),0];
+            J(2,:) = [0,-l*sin(q(2)),self.a(3)*cos(q(2))*cos(q(3)),-self.a(4)*cos(q(2))*sin(q(4)),0];
             J(3,:) = [0,0,-self.a(3)*sin(q(3)),-self.a(4)*cos(q(4)),0];
             J(4,:) = [0,0,0,0,0];
             J(5,:) = [0,0,0,0,0];
