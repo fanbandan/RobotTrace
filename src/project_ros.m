@@ -38,10 +38,13 @@ function project_ros()
         end    
     end
     %% Get image from camera
-    camMsg = receive(camSub,0.1);
-    image = readImage(camMsg);
+    
+%     camMsg = receive(camSub,0.1);
+%     image = readImage(camMsg);
     %% Vision
     compV = ComputerVision.Interface();
+    % Get image from camera
+    compv.getImage(camSub);
     edges = compV.GetPathPixel(image);
     %% Path Extraction
     
