@@ -1,11 +1,11 @@
 classdef Vision < handle
     properties (SetAccess = private)
-        
+        % Add a debug variable to spit out data when enabled--------------
+        debug
     end
     methods (Access = public)
         function self = Vision()
-            
-            %Constructor -----------------------------Do I need stuff here?
+            self.debug = false;
         end
         function maskedRGBImage = colourMask(RGB)
             
@@ -40,6 +40,10 @@ classdef Vision < handle
         function edgeImage = edgeDetection(image)
             %Canny Edge Detection
             edgeImage = edge(image,'canny');
+        end
+        function image = getImage(camSub)
+            camMsg = receive(camSub, 0.1);
+            image = readImage(camMsg);            
         end
     end
 end
