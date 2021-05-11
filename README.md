@@ -10,3 +10,7 @@
 ### Dependencies
 
 - Gavin Paul's [log4matlab script](https://au.mathworks.com/matlabcentral/fileexchange/33532-log4matlab)
+
+### Source Code
+
+Read documentation on source code [here](src/README.md)
