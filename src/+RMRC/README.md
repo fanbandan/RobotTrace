@@ -1,6 +1,6 @@
 ## Initialising Dobot Model
 
-**Before initalising the robot** make sure to follow the instructions on the [Main Read Me]('../../README.md')
+**Before initalising the robot** make sure to follow the instructions on the [Main Read Me](../../README.md)
 
 ### Dobot Sim Model
 
