@@ -2,7 +2,7 @@
 clf
 CVI = ComputerVision.Interface();
 %% 1. Get image mask & AR Tag
-imgMask = imread([workspace, '\data\path_images\path_unproccessed (1).bmp']);
+imgMask = imread([workspace, '\data\lab_photos\5.jpg']);
 % px = -size(imgMask,2)/2;
 % py = 120;
 u0 = size(imgMask,2)/2;
@@ -14,11 +14,18 @@ AR_P = [0,0,0.6];
 pw = 1;
 ph = 1;
 
+C = [ ...
+    665.578756,    0,          282.225564; ...
+    0,              664.605455, 260.138094; ...
+    0,              0,          1; ...
+    ];
+
 C = [f/pw,  0,      u0;
     0,      f/ph,   v0;
     0,      0,      1;];
 
 %% 2. Convert to X Y Z cartesian
+imgMask = imgMask./255;
 [pixelY,pixelX,~] = find(imgMask);
 
 p = C*AR_P';
@@ -27,9 +34,9 @@ zPlaneNormal = Quaternion2Normal(AR_Q)';
 %%
 points = NaN(length(pixelX),3);
 
-[X,Y] = meshgrid(1:10:540,1:10:540);
-pixelX = X(:);
-pixelY = Y(:);
+% [X,Y] = meshgrid(1:10:540,1:10:540);
+% pixelX = X(:);
+% pixelY = Y(:);
 
 for i = 1:length(pixelX)
     points(i,:) = Pixel2World(pixelX(i),pixelY(i),C,zPlaneNormal,zPlanePoint)';
