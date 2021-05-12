@@ -1,13 +1,13 @@
 classdef Vision < handle
     properties (SetAccess = private)
         % Add a debug variable to spit out data when enabled--------------
-        debug
+        %         debug %Delete----------------------
     end
     methods (Access = public)
         function self = Vision()
-            self.debug = false;
+            %             self.debug = false; %Delete----------------
         end
-        function maskedRGBImage = colourMask(RGB)
+        function maskedRGBImage = colourMask(RGB, debug)
             
             % Convert RGB image to chosen color space
             I = rgb2hsv(RGB);
@@ -35,15 +35,17 @@ classdef Vision < handle
             
             % Set background pixels where BW is false to zero.
             maskedRGBImage(repmat(~BW,[1 1 3])) = 0;
+            if debug == true
+                imshow(maskedRGBImage);
+            end
         end
         
-        function edgeImage = edgeDetection(image)
+        function edgeImage = edgeDetection(image, debug)
             %Canny Edge Detection
             edgeImage = edge(image,'canny');
-        end
-        function image = getImage(camSub)
-            camMsg = receive(camSub, 0.1);
-            image = readImage(camMsg);            
+            if debug == true
+                imshow(edgeImage);
+            end
         end
     end
 end
