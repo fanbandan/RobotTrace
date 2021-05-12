@@ -5,9 +5,8 @@ classdef Vision < handle
     end
     methods (Access = public)
         function self = Vision()
-            %             self.debug = false; %Delete----------------
         end
-        function maskedRGBImage = colourMask(RGB, debug)
+        function maskedRGBImage = colourMask(self, RGB, debug)
             
             % Convert RGB image to chosen color space
             I = rgb2hsv(RGB);
@@ -40,7 +39,7 @@ classdef Vision < handle
             end
         end
         
-        function edgeImage = edgeDetection(image, debug)
+        function edgeImage = edgeDetection(self, image, debug)
             %Canny Edge Detection
             edgeImage = edge(image,'canny');
             if debug == true
