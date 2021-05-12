@@ -28,14 +28,8 @@ classdef Interface < handle
         function SetTags(gameTag, robotTag)
             self.gameTag = gameTag;
             self.robotTag = robotTag;
-            %Pose Calculation - Please check this
-            %        quat = [x y z w]; %CHECK THIS IS CORRECT FORMAT
-            self.gameRotm = quat2rotm([self.gameTag.orientation.x self.gameTag.orientation.y self.gameTag.orientation.z self.gameTag.orientation.w])
-            % gameRotm = [gameRotm; ones(1,3)]
-            % gameRotm = [gameRotm ones(4,1)]
-            self.robotRotm = quat2rotm([self.robotTag.orientation.x self.robotTag.orientation.y self.robotTag.orientation.z self.robotTag.orientation.w])
-            % robotRotm = [robotRotm; ones(1,3)]
-            % robotRotm = [robotRotm ones(4,1)]
+            self.gameRotm = quat2rotm([self.gameTag.pose.orientation.x self.gameTag.pose.orientation.y self.gameTag.pose.orientation.z self.gameTag.pose.orientation.w])
+            self.robotRotm = quat2rotm([self.robotTag.pose.orientation.x self.robotTag.pose.orientation.y self.robotTag.pose.orientation.z self.robotTag.pose.orientation.w])
             
         end
         function [gameTag , robotTag] = GetTags(self)
@@ -47,45 +41,42 @@ classdef Interface < handle
         %     r21 r22 r23 py;
         %     r31 r32 r33 pz;
         %     0    0    0  1;];
-        %   Derived from AR Tags
+        %   Derived from AR Tags - Remember tag coordinate system is different (z is depth)
         function T = GetRobot2GameTransformationMatrix(self)
-            robot2GamePose = transl(gameTag.position.x, gameTag.position,y, gameTag.position.z)*gameRotm/transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm;
-            rotm = gameRotm
-            T= [r11 r12 r13 px;
-                r21 r22 r23 py;
-                r31 r32 r33 pz;
-                0    0    0  1;];
+            rotm = gameRotm - robotRotm;
+            rotm = [rotm; zeroes(1,3)];
+            transm = [self.gameTag.pose.position.x - self.robotTag.pose.position.x; self.gameTag.pose.position.y - self.robotTag.pose.position.y; self.gameTag.pose.position.z - self.robotTag.pose.position.z;1;]
+            T= [rotm transm];
         end
         function T = GetGame2RobotTransformationMatrix(self)
-            game2RobotPose = transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm/transl(gameTag.position.x, gameTag.position.y, gameTag.position.z)*gameRotm;
-            T= [r11 r12 r13 px;
-                r21 r22 r23 py;
-                r31 r32 r33 pz;
-                0    0    0  1;];
+            rotm = robotRotm - gameRotm;
+            rotm = [rotm; zeroes(1,3)];
+            transm = [self.robotTag.pose.position.x - self.gameTag.pose.position.x; self.robotTag.pose.position.y - self.gameTag.pose.position.y; self.robotTag.pose.position.z - self.gameTag.pose.position.z;1;]
+            T= [rotm transm];
         end
         function T = GetCamera2GameTransformationMatrix(self)
-            T= [r11 r12 r13 px;
-                r21 r22 r23 py;
-                r31 r32 r33 pz;
-                0    0    0  1;];
+            rotm = gameRotm;
+            rotm = [rotm; zeroes(1,3)];
+            transm = [self.gameTag.pose.position.x; self.gameTag.pose.position.y; self.gameTag.pose.position.z;1;]
+            T= [rotm transm];
         end
         function T = GetGame2CameraTransformationMatrix(self)
-            T= [r11 r12 r13 px;
-                r21 r22 r23 py;
-                r31 r32 r33 pz;
-                0    0    0  1;];
+            rotm = -gameRotm;
+            rotm = [rotm; zeroes(1,3)];
+            transm = [-self.gameTag.pose.position.x; -self.gameTag.pose.position.y; -self.gameTag.pose.position.z;1;]
+            T= [rotm transm];
         end
         function T = GetRobot2CameraTransformationMatrix(self)
-            T= [r11 r12 r13 px;
-                r21 r22 r23 py;
-                r31 r32 r33 pz;
-                0    0    0  1;];
+            rotm =  -robotRotm;
+            rotm = [rotm; zeroes(1,3)];
+            transm = [-self.robotTag.pose.position.x; -self.robotTag.pose.position.y; -self.robotTag.pose.position.z;1;]
+            T= [rotm transm];
         end
         function T = GetCamera2RobotTransformationMatrix(self)
-            T= [r11 r12 r13 px;
-                r21 r22 r23 py;
-                r31 r32 r33 pz;
-                0    0    0  1;];
+            rotm = robotRotm;
+            rotm = [rotm; zeroes(1,3)];
+            transm = [self.robotTag.pose.position.x; self.robotTag.pose.position.y; self.robotTag.pose.position.z;1;]
+            T= [rotm transm];
         end
         function cameraImage = getImage(camSub, debug)
             camMsg = receive(camSub, 0.1);
