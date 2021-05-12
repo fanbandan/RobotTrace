@@ -1,10 +1,14 @@
 classdef Interface < handle
     %Vision Interface - Interface for recognising game path in camera image feed.
     %   DETAILED DESCRIPTION GOES HERE
-    properties (Access = public)
+    properties (Access = public) %Delete if not used
     end
     properties (Access = private)
         vision Vision
+        gameTag
+        gameRotm
+        robotTag
+        robotRotm
     end
     methods (Access = public)
         function self = Interface()            
@@ -21,30 +25,74 @@ classdef Interface < handle
     end
     methods (Access = public)
         %Transformation Matrices
-        %   Derived from AR Tags
-        function T = GetRobot2GameTransformationMatrix(self)
+        function SetTags(gameTag, robotTag)
+            self.gameTag = gameTag;
+            self.robotTag = robotTag;
             %Pose Calculation - Please check this
             %        quat = [x y z w]; %CHECK THIS IS CORRECT FORMAT
-            wireRotm = quat2rotm([wireTag.orientation.x wireTag.orientation.y wireTag.orientation.z wireTag.orientation.w])
-            wireRotm = [wireRotm; ones(1,3)]
-            wireRotm = [wireRotm ones(4,1)]
-            robotRotm = quat2rotm([robotTag.orientation.x robotTag.orientation.y robotTag.orientation.z robotTag.orientation.w])
-            robotRotm = [robotRotm; ones(1,3)]
-            robotRotm = [robotRotm ones(4,1)]
+            self.gameRotm = quat2rotm([self.gameTag.orientation.x self.gameTag.orientation.y self.gameTag.orientation.z self.gameTag.orientation.w])
+            % gameRotm = [gameRotm; ones(1,3)]
+            % gameRotm = [gameRotm ones(4,1)]
+            self.robotRotm = quat2rotm([self.robotTag.orientation.x self.robotTag.orientation.y self.robotTag.orientation.z self.robotTag.orientation.w])
+            % robotRotm = [robotRotm; ones(1,3)]
+            % robotRotm = [robotRotm ones(4,1)]
             
-            %%Find the transforms from each ar tag------------------------
-            wire2RobotPose = transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm/transl(wireTag.position.x, wireTag.position.y, wireTag.position.z)*wireRotm;
-            robot2WirePose = transl(wireTag.position.x, wireTag.position,y, wireTag.position.z)*wireRotm/transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm;
+        end
+        function [gameTag , robotTag] = GetTags(self)
+            gameTag = self.gameTag;
+            robotTag = self.robotTag;
+        end
+        %Transformation matrix
+        % T= [r11 r12 r13 px;
+        %     r21 r22 r23 py;
+        %     r31 r32 r33 pz;
+        %     0    0    0  1;];
+        %   Derived from AR Tags
+        function T = GetRobot2GameTransformationMatrix(self)
+            robot2GamePose = transl(gameTag.position.x, gameTag.position,y, gameTag.position.z)*gameRotm/transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm;
+            rotm = gameRotm
+            T= [r11 r12 r13 px;
+                r21 r22 r23 py;
+                r31 r32 r33 pz;
+                0    0    0  1;];
         end
         function T = GetGame2RobotTransformationMatrix(self)
+            game2RobotPose = transl(robotTag.position.x, robotTag.position.y, robotTag.position.z)*robotRotm/transl(gameTag.position.x, gameTag.position.y, gameTag.position.z)*gameRotm;
+            T= [r11 r12 r13 px;
+                r21 r22 r23 py;
+                r31 r32 r33 pz;
+                0    0    0  1;];
         end
         function T = GetCamera2GameTransformationMatrix(self)
+            T= [r11 r12 r13 px;
+                r21 r22 r23 py;
+                r31 r32 r33 pz;
+                0    0    0  1;];
         end
         function T = GetGame2CameraTransformationMatrix(self)
+            T= [r11 r12 r13 px;
+                r21 r22 r23 py;
+                r31 r32 r33 pz;
+                0    0    0  1;];
         end
         function T = GetRobot2CameraTransformationMatrix(self)
+            T= [r11 r12 r13 px;
+                r21 r22 r23 py;
+                r31 r32 r33 pz;
+                0    0    0  1;];
         end
         function T = GetCamera2RobotTransformationMatrix(self)
+            T= [r11 r12 r13 px;
+                r21 r22 r23 py;
+                r31 r32 r33 pz;
+                0    0    0  1;];
+        end
+        function cameraImage = getImage(camSub, debug)
+            camMsg = receive(camSub, 0.1);
+            cameraImage = readImage(camMsg);
+            if debug == true
+                imshow(cameraImage);
+            end
         end
     end
     methods (Access = private)
