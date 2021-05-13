@@ -8,11 +8,11 @@ function project_ros()
     %generate paths
     %%
     clc
-    ctl = Controller(true,false);
+    ctl = Controller(true,true);
     ctl.AcquireImageMask();
-    ctl.GeneratePathPoints();
+    ctl.GeneratePathPoints(0.6);
     %%
-    ctl.GeneratePath(200, 0.1, 1, 0.6);
+    ctl.GeneratePath(2000, 0.05, 1, 0.6);
     ctl.ShowPath();
     
     

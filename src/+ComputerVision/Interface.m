@@ -48,7 +48,7 @@ classdef Interface < handle
             if exist('zDepthOverride','var')
                 position(3) = zDepthOverride;
             end
-            orientation = [1, 0, 0];
+            orientation = [0, 0, 1];
             point = self.GetCameraMatrix() * position;
             point = point';
             normal = orientation';
@@ -95,7 +95,7 @@ classdef Interface < handle
                 image = self.vision.GetImage();
             else
                 % Change this to some default image
-                image = imread([pwd, '\data\lab_photos\5.jpg']);
+                image = imread([pwd, '//data//demo.jpg']);
             end
         end
     end

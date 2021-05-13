@@ -18,7 +18,7 @@ classdef Controller < handle
             %CONTROLLER Construct an instance of this class
             %   Detailed explanation goes here
             self.debug = debug;
-            self.CVI = ComputerVision.Interface(debug, rosMode);
+            self.CVI = ComputerVision.Interface(debug, false);
             self.PEI = PathExtraction.Interface(debug);
             self.RMRCI = RMRC.Interface(self.CVI, debug, rosMode);
         end
@@ -45,6 +45,7 @@ classdef Controller < handle
         end
         function GeneratePath(self, downsample, maxDistance, averaging, smoothing)
             startGuess = self.RMRCI.GetRobotPose();
+            startGuess = [0.306,0.28,0.60];
             path = self.PEI.GeneratePath(downsample, startGuess, maxDistance);
             if length(path) < 5
                 warning('No path found!');

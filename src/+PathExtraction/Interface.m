@@ -4,7 +4,7 @@ classdef Interface < handle
     %   Creates cartesian path from an image in path coordinate frame.
     properties (Access = public)
     end
-    properties (Access = private)
+    properties 
         Path PathExtraction.Path
         Debug logical = false;
         
@@ -27,7 +27,7 @@ classdef Interface < handle
             self.Path.UpdatePointCloud(points(1,:),points(2,:),points(3,:));
         end
         function path = GeneratePath(self, downsample, startGuess, maxDistance)
-            self.Path.DownsamplePointCloud(downsample);
+%             self.Path.DownsamplePointCloud(downsample);
             path = self.Path.GeneratePath(startGuess, maxDistance);
         end
         function GenerateSpline(self, averaging, smoothing)
