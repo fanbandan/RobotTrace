@@ -85,8 +85,10 @@ methods (Access = public)
         
         self.spline = [csx;csy;csz];
         self.bounds = [t(1);t(end)];
-        
-        figure;
+    end
+    function PlotSpline(self, h)
+        figure(h);
+        t = 1:length(self.pathPoints);
         x = fnval(self.spline(1),t);
         y = fnval(self.spline(2),t);
         z = fnval(self.spline(3),t);
