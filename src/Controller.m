@@ -34,9 +34,9 @@ classdef Controller < handle
             robot = self.CVI.GetCamera2RobotTransformationMatrix();
             game = self.CVI.GetCamera2GameTransformationMatrix();
         end
-        function GeneratePathPoints(self)
+        function GeneratePathPoints(self, zDepthOverride)
             cameraMatrix = self.CVI.GetCameraMatrix();
-            [normal, point] = GetGamePlane(self);
+            [normal, point] = self.CVI.GetGamePlane(self, zDepthOverride);
             self.PEI.UpdatePath(self.imageMask, cameraMatrix, normal, point);
         end
         function GeneratePath(self, downsample, maxDistance, averaging, smoothing)
@@ -52,7 +52,10 @@ classdef Controller < handle
             self.RMRCI.UpdatePath(pathPoses);
         end
         function Run(self)
-            self.RMRCI.
+            self.RMRCI.FollowPath();
+        end
+        function EStop(self)
+            self.RMRCI.Stop();
         end
     end
     methods (Access = protected)
