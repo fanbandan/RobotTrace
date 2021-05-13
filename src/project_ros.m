@@ -6,6 +6,14 @@ function project_ros()
     %aquireimagemask
     %cotroller.generataotc points
     %generate paths
+    %%
+    clc
+    ctl = Controller(true,false);
+    ctl.AcquireImageMask();
+    ctl.GeneratePathPoints();
+    %%
+    ctl.GeneratePath(200, 0.1, 1, 0.6);
+    ctl.ShowPath();
     
     
     %     L.mlog = {L.DEBUG,'Main','ROS Initialised'}; 

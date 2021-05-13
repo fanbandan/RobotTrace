@@ -26,11 +26,11 @@ classdef Interface < handle
             points = self.Pixels2Points(pixelX, pixelY, CameraMatrix);
             self.Path.UpdatePointCloud(points(1,:),points(2,:),points(3,:));
         end
-        function GeneratePath(self, downsample, startGuess, maxDistance)
+        function path = GeneratePath(self, downsample, startGuess, maxDistance)
             self.Path.DownsamplePointCloud(downsample);
-            self.Path.GeneratePath(startGuess, maxDistance);
+            path = self.Path.GeneratePath(startGuess, maxDistance);
         end
-        function GenerateSpline(averaging, smoothing)
+        function GenerateSpline(self, averaging, smoothing)
             if smoothing < 0 || smoothing > 1
                 error("Smoothing value must be between 0 and 1");
             end

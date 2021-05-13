@@ -42,7 +42,7 @@ methods (Access = public)
             size(self.pCloud.Location)
         end
     end
-    function GeneratePath(self, startGuess, maxDistance)
+    function pathPoints = GeneratePath(self, startGuess, maxDistance)
         P = startGuess;                    % Start location of trajectory
         L = self.pCloud.Location;           % List of all points
         R = NaN(size(L));               % Final sorted list
@@ -68,7 +68,8 @@ methods (Access = public)
             P = PN;
         end
         % Trim result list, not all points may have been connected.
-        self.pathPoints = R(1:(i-1),:)';
+        pathPoints = R(1:(i-1),:)';
+        self.pathPoints = pathPoints; 
     end
     function PathSmoothing(self, averagingNumber)
         x = movmean(self.pathPoints(1,:),averagingNumber);
