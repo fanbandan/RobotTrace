@@ -5,6 +5,7 @@ classdef Interface < handle
     end
     properties (Access = private)
         vision Vision
+        ar AR
         Debug logical = false;
         ROSMode logical = true;
         gameTag
@@ -14,12 +15,15 @@ classdef Interface < handle
     end
     methods (Access = public)
         function self = Interface(debug, rosMode)
-            self.vision = ComputerVision.Vision;
             if ~isempty(debug)
                 self.Debug = debug;
             end
             if ~isempty(rosMode)
                 self.ROSMode = rosMode;
+            end
+            if self.ROSMode == false
+                self.vision = ComputerVision.Vision(debug);
+                self.ar = ComputerVision.AR(debug);
             end
         end
         function BWImage = GetImageMask(self)
@@ -27,9 +31,27 @@ classdef Interface < handle
             %   [1] pixel at uv coordinate contains copper pipe.
             %   [0] pixel at uv coordinate does not contain copper pipe.
             image = self.GetImage();
-            maskedRGBImage = self.vision.colourMask(image);
-            edgeImage = self.vision.edgeDetection(maskedRGBImage);
+            maskedRGBImage = ComputerVision.Vision.colourMask(image);
+            edgeImage = ComputerVision.Vision.edgeDetection(maskedRGBImage);
             BWImage = edgeImage;
+        end
+        function [cameraMatrix] = GetCameraMatrix(self)
+            cameraMatrix = [ ...
+                665.578756,    0,          282.225564; ...
+                0,              664.605455, 260.138094; ...
+                0,              0,          1; ...
+                ];
+        end
+        function [normal, point] = GetGamePlane(self)
+            game = self.ar.GetGamePose();
+            position = transl(game);
+            orientation = [1, 0, 0]';
+            point = self.GetCameraMatrix() * position';
+            point = point';
+            normal = orientation';
+        end
+        function UpdateARTags(self)
+            self.ar.GetARTags(self);
         end
     end
     methods (Access = public)
