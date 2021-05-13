@@ -2,6 +2,12 @@ function project_ros()
     % for image stuff: for sim use webcam, for real use usb_cam topic
     %% Ros Setup
     rosinit
+    %Controller
+    %aquireimagemask
+    %cotroller.generataotc points
+    %generate paths
+    
+    
     %     L.mlog = {L.DEBUG,'Main','ROS Initialised'}; 
     %% Create and initialise robot
     dobot = DobotMagician();
@@ -44,25 +50,26 @@ function project_ros()
     cameraImage = compv.getImage(camSub);
     edges = compV.GetPathPixel(cameraImage);
     
+    
     %% AR Tag detection
-    tagMsg = receive(tagSub ,5); %Set to 5 second wait currently ----
-    tagData = tagMsg(1).Poses;
-    tagSize = size(tagData , 1);
-    if tagSize > 1
+%     tagMsg = receive(tagSub ,5); %Set to 5 second wait currently ----
+%     tagData = tagMsg(1).Poses;
+%     tagSize = size(tagData , 1);
+%     if tagSize > 1
 %         tags = tagMsg.Poses;
-        %Need to sort which ar tag is which based of id ----------
-        gameTag = tags.Poses(1).pose;
-        robotTag = tags.Poses(2).pose;
-        fprintf('gameTag: %d,%d,%d \n',gameTag.pose.position.x, gameTag.pose.position.y, gameTag.pose.position.z);
-        fprintf('robotTag: %d,%d,%d \n',robotTag.pose.position.x, robotTag.pose.position.y, robotTag.pose.position.z);
-        % for i=1:tagSize
-        %     if tags(i).Id == 1 %------------------------------------
-        %         gameTag = tags(i).pose.pose;
-        %     elseif tags(i).Id == 2 %--------------------------------
-        %         robotTag = tags(i).pose.pose;
-        %     end   
-        % end    
-    end
+%         Need to sort which ar tag is which based of id ----------
+%         gameTag = tags.Poses(1).pose;
+%         robotTag = tags.Poses(2).pose;
+%         fprintf('gameTag: %d,%d,%d \n',gameTag.pose.position.x, gameTag.pose.position.y, gameTag.pose.position.z);
+%         fprintf('robotTag: %d,%d,%d \n',robotTag.pose.position.x, robotTag.pose.position.y, robotTag.pose.position.z);
+%         for i=1:tagSize
+%             if tags(i).Id == 1 %------------------------------------
+%                 gameTag = tags(i).pose.pose;
+%             elseif tags(i).Id == 2 %--------------------------------
+%                 robotTag = tags(i).pose.pose;
+%             end   
+%         end    
+%     end
 
 
     %% Path Extraction
