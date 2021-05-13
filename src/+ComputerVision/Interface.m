@@ -14,7 +14,7 @@ classdef Interface < handle
         robotRotm
     end
     methods (Access = public)
-        function self = Interface(debug, rosMode)
+        function self = Interface(rosMode, debug)
             if exist('debug','var')
                 self.Debug = debug;
             end
@@ -32,7 +32,8 @@ classdef Interface < handle
             %   [0] pixel at uv coordinate does not contain copper pipe.
             image = self.GetImage();
             maskedRGBImage = ComputerVision.Vision.colourMask(image);
-            edgeImage = ComputerVision.Vision.edgeDetection(maskedRGBImage);
+%             edgeImage = ComputerVision.Vision.edgeDetection(maskedRGBImage);
+            edgeImage = maskedRGBImage(:,:,3);            
             BWImage = edgeImage;
         end
         function [cameraMatrix] = GetCameraMatrix(self)
@@ -64,28 +65,28 @@ classdef Interface < handle
             if self.rosMode == true
                 T = self.ar.GetGamePose();
             else
-                T = transl(0,0,0);
+                T = transl(0.2,0.15,0);
             end
         end
         function T = GetGame2CameraTransformationMatrix(self)
             if self.rosMode == true
                 T = inv(self.ar.GetGamePose());
             else
-                T = transl(0,0,0);
+                T = inv(self.GetCamera2GameTransformationMatrix());
             end
         end
         function T = GetRobot2CameraTransformationMatrix(self)
             if self.rosMode == true
                 T = inv(self.ar.GetRobotPose());
             else
-                T = transl(0,0,0);
+                T = inv(self.GetGame2CameraTransformationMatrix());
             end
         end
         function T = GetCamera2RobotTransformationMatrix(self)
             if self.rosMode == true
                 T = self.ar.GetRobotPose();
             else
-                T = transl(0,0,0);
+                T = transl(0.5,0.1,0.6);
             end
         end
     end

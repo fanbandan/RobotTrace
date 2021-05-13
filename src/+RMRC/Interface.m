@@ -17,7 +17,7 @@ classdef Interface < handle
         path;
     end
     methods (Access = public)
-        function self = Interface(cvi, deltaT, debug, rosMode)
+        function self = Interface(cvi, deltaT, rosMode, debug)
             self.CVI = cvi;
             self.dobot = RMRC.Dobot();
             self.deltaT = deltaT;
