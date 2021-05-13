@@ -4,8 +4,8 @@ classdef Interface < handle
     properties (Access = public) %Delete if not used
     end
     properties (Access = private)
-        vision Vision
-        ar AR
+        vision ComputerVision.Vision
+        ar ComputerVision.AR
         Debug logical = false;
         rosMode logical = true;
         gameTag
