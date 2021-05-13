@@ -3,9 +3,13 @@
 % Intersection bool
 % Number of planes
 % Empty traj point int
+intersect = false;
+noOfPlane = 6;
+noOfTrajPoints = 1;
 
 % Create a plan at all 6 walls of the workspace cube by obtaining the
 % workspace dimensions
+
 
 % Get the points within the current trajectory and number of points
 
