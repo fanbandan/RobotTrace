@@ -12,7 +12,7 @@ properties (Access = private)
 end
 methods (Access = public)
     function self = Path(debug)
-        if ~isempty(debug)
+        if exist('debug','var')
             self.debug = debug;
         end
     end
