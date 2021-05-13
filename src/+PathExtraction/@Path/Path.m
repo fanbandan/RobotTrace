@@ -89,7 +89,9 @@ methods (Access = public)
         plot3(ax, x,y,z);
     end
     function ShowPointCloud(self, ax)
-        pcshow(ax, self.pCloud);
+        scatter3(ax, self.pCloudSource.Location(:,1),self.pCloudSource.Location(:,2),self.pCloudSource.Location(:,3), '.');
+        hold(ax)
+        scatter3(ax, self.pCloud.Location(:,1),self.pCloud.Location(:,2),self.pCloud.Location(:,3), '.');
     end
     function ShowPath(self, ax)
         plot3(ax, self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:));
