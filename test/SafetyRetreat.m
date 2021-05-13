@@ -8,4 +8,4 @@
 
 % Use robot ikine to find joint pose q
 
-% Move to joint configuration (robot jtraj)
+% Move to joint configuration (jtraj)
