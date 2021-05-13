@@ -2,11 +2,17 @@ classdef Vision < handle
     properties (SetAccess = private)
         % Add a debug variable to spit out data when enabled--------------
         %         debug %Delete----------------------
+        CamSub
+        Debug logical = false;
     end
     methods (Access = public)
-        function self = Vision()
+        function self = Vision(debug)
+            self.CamSub = rossubscriber('/usb_cam/image_raw');
+            if ~isempty(debug)
+                self.Debug = debug;
+            end
         end
-        function maskedRGBImage = colourMask(self, RGB, debug)
+        function maskedRGBImage = colourMask(self, RGB)
             
             % Convert RGB image to chosen color space
             I = rgb2hsv(RGB);
@@ -34,16 +40,22 @@ classdef Vision < handle
             
             % Set background pixels where BW is false to zero.
             maskedRGBImage(repmat(~BW,[1 1 3])) = 0;
-            if debug == true
+            if self.Debug == true
                 imshow(maskedRGBImage);
             end
-        end
-        
-        function edgeImage = edgeDetection(self, image, debug)
+        end        
+        function edgeImage = edgeDetection(self, image)
             %Canny Edge Detection
             edgeImage = edge(image,'canny');
-            if debug == true
+            if self.Debug == true
                 imshow(edgeImage);
+            end
+        end
+        function image = GetImage(self)
+            camMsg = receive(self.CamSub, 0.1);
+            image = readImage(camMsg);
+            if self.Debug == true
+                imshow(image);
             end
         end
     end
