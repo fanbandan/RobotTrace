@@ -11,7 +11,8 @@ workspace = [-1,1,-1,1,-1,1];
 qn = [0, deg2rad([0, 5, 0, 0])];
 % q is optional.
 dobot.PlotRobot(workspace,qn);
-
+axis equal
+    
 %% Start "real-time" simulation
 q = qn;                 % Set initial robot configuration 'q'
 
@@ -36,16 +37,16 @@ while( toc < duration)
     I = eye(4);
     
     % Gain values for linear and angular velocity control
-    K_lin = 0.3;
-    K_ang = 0.8;
+    K_lin = 0.03;
+    K_ang = 0.05;
     
-    vx = K_lin*axes(5); % x
-    wx = K_ang*axes(1); % roll
-    vy = K_lin*axes(4); % y
-    wy = K_ang*axes(2); % pitch
-    vz = K_lin*(axes(6)-axes(3)); % z
-    wz = K_ang*(buttons(5)-buttons(6)); % yaw
-%   x = [vx; vy; vz; wx; wy; wz];
+    vx = K_lin*axes(4); % x
+    % wx = K_ang*(buttons(5)-buttons(6)); % roll
+    vy = K_lin*axes(5); % y
+    % wy = K_ang*(axes(6)-axes(3)); % pitch
+    vz = K_lin*axes(2); % z
+    wz = K_ang*axes(1); % yaw
+    % x = [vx; vy; vz; wx; wy; wz];
     x = [vx; vy; vz; wz];
     
     J = dobot.jacob(q(end,:));
@@ -60,6 +61,7 @@ while( toc < duration)
     
     % Update plot
     q = [q 0];
+    pause(0.01);
     dobot.Animate(q);
     pause(0.01);
         
