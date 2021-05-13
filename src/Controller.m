@@ -11,6 +11,7 @@ classdef Controller < handle
         rosMode logical = true;
         debug logical = false;
         
+        image;
         imageMask;
         pathPoints;
         pathStartGuess;
@@ -33,16 +34,16 @@ classdef Controller < handle
         function image = AcquireImageMask(self)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            image = self.CVI.GetImageMask();
+            self.image = self.CVI.GetImageMask();
             self.CVI.UpdateARTags();
-            self.imageMask = image;
+            self.imageMask = self.image;
         end
         function [robot,game] = GetPoses(self)
             % Not yet implemented
             robot = self.CVI.GetCamera2RobotTransformationMatrix();
             game = self.CVI.GetCamera2GameTransformationMatrix();
         end
-        function GeneratePathPoints(self, zDepthOverride)
+        function points = GeneratePathPoints(self, zDepthOverride)
             cameraMatrix = self.CVI.GetCameraMatrix();
             if exist('zDepthOverride','var')
                 [normal, point] = self.CVI.GetGamePlane(zDepthOverride);
@@ -52,19 +53,24 @@ classdef Controller < handle
             if self.debug == true
                 figure(104);
             end
-            self.PEI.UpdatePathMask(self.imageMask, cameraMatrix, normal, point);
+            points = self.PEI.UpdatePathMask(self.imageMask, cameraMatrix, normal, point);
         end
-        function GeneratePath(self, downsample, maxDistance, averaging, smoothing)
+        function DownsamplePathPoints(self, downsample)
+            self.PEI.DownsamplePoints(downsample);
+        end
+        function success = GeneratePath(self, maxDistance, averaging, smoothing)
             startGuess = self.pathStartGuess;
             if self.debug == true
                 figure(105);
             end
-            path = self.PEI.GeneratePath(downsample, startGuess, maxDistance);
+            path = self.PEI.GeneratePath(startGuess, maxDistance);
             
             if length(path) < 5
                 warning('No path found!');
+                success = false;
                 return
             end
+            success = true;
             self.PEI.GenerateSpline(averaging, smoothing);
         end
         function UpdatePathStartGuess(self, manualGuess)
@@ -73,9 +79,6 @@ classdef Controller < handle
             else
                 self.pathStartGuess = self.RMRCI.GetRobotPose();
             end
-        end
-        function ShowPath(self)
-            self.PEI.PlotSpline(figure(402));
         end
         function path = GetTrajectory(self, samples)
             path = self.PEI.GetTrajectory(samples);
@@ -97,11 +100,14 @@ classdef Controller < handle
     end
     methods
         % Debug / Visual methods
-        function ShowPathPointCloud(self, h)
-            self.PEI.ShowPointCloud(h);
+        function ShowPathImage(self, ax)
+            imshow(self.imageMask, 'Parent', ax);
         end
-        function ShowPathSpline(self, h)
-            self.PEI.PlotSpline(h);
+        function ShowPathPointCloud(self, ax)
+            self.PEI.ShowPointCloud(ax);
+        end
+        function ShowPathSpline(self, ax)
+            self.PEI.PlotSpline(ax);
         end
     end
     methods (Access = protected)

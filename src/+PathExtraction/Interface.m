@@ -18,7 +18,7 @@ classdef Interface < handle
                 self.debug = debug;
             end
         end
-        function UpdatePathMask(self, image, CameraMatrix, zNormal, zPoint)
+        function points = UpdatePathMask(self, image, CameraMatrix, zNormal, zPoint)
             self.zNormal = zNormal;
             self.zPoint = zPoint;
             [pixelY,pixelX,~] = find(image); % check x and y!
@@ -29,8 +29,10 @@ classdef Interface < handle
                 self.ShowPointCloud(gca);
             end
         end
-        function path = GeneratePath(self, downsample, startGuess, maxDistance)
+        function DownsamplePoints(self, downsample)
             self.Path.DownsamplePointCloud(downsample);
+        end
+        function path = GeneratePath(self, startGuess, maxDistance)
             path = self.Path.GeneratePath(startGuess, maxDistance);
             if self.debug
                 self.Path.AnimatePath(gca);
