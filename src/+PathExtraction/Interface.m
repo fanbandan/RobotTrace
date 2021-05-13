@@ -40,6 +40,9 @@ classdef Interface < handle
             self.Path.PathSmoothing(averaging);
             self.Path.SplineFitting(smoothing);
         end
+        function PlotSpline(self, h)
+            self.Path.PlotSpline(h);
+        end
         function [x] = GetTrajectory(self, samples)
             x = self.Path.GetSplinePoints(samples);
         end

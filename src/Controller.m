@@ -28,7 +28,7 @@ classdef Controller < handle
             image = self.CVI.GetImageMask();
             self.CVI.UpdateARTags();
             self.imageMask = image;
-        end        
+        end
         function [robot,game] = GetPoses(self)
             % Not yet implemented
             robot = self.CVI.GetCamera2RobotTransformationMatrix();
@@ -42,7 +42,14 @@ classdef Controller < handle
         function GeneratePath(self, downsample, maxDistance, averaging, smoothing)
             startGuess = self.RMRCI.GetRobotPose();
             self.PEI.GeneratePath(downsample, startGuess, maxDistance);
-            self.pathPoints = self.PEI.GenerateSpline(averaging, smoothing);
+            self.PEI.GenerateSpline(averaging, smoothing);
+        end
+        function ShowPath(self)
+            self.PEI.PlotSpline(figure(402));
+        end
+        function path = GetTrajectory(self, samples)
+            path = self.PEI.GetTrajectory(samples);
+            self.pathPoints = path;
         end
         function LoadTrajectory(self)
             pathPoses = zeros(4,4,length(self.pathPoints));
