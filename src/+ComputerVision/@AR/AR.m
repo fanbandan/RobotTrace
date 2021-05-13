@@ -1,7 +1,7 @@
 classdef AR < handle
     properties (SetAccess = private)
         ARSub
-        Debug logical = false;
+        debug logical = false;
         ARPoses
         ExpectedTagNumber = 2;
     end
@@ -9,7 +9,7 @@ classdef AR < handle
         function self = AR(debug)
             self.ARSub = rossubscriber('/tags');
             if ~isempty(debug)
-                self.Debug = debug;
+                self.debug = debug;
             end
         end
         function arTags = UpdateARTags(self)
