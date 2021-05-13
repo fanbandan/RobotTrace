@@ -1,4 +1,4 @@
-classdef Controller
+classdef Controller < handle
     %CONTROLLER Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -9,6 +9,9 @@ classdef Controller
         PEI PathExtraction.Interface
         RMRCI RMRC.Interface
         Debug logical = false;
+        
+        imageMask;
+        pathPoints;
     end
     methods (Access = public)
         function self = Controller(debug)
@@ -19,15 +22,37 @@ classdef Controller
             self.PEI = PathExtraction.Interface(self.CVI, debug);
             self.RMRCI = RMRC.Interface(self.CVI, debug);
         end
-        
-        function img = AcquireImageMask(self)
+        function image = AcquireImageMask(self)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            img = self.CVI.GetImageMask();
+            image = self.CVI.GetImageMask();
+            self.CVI.UpdateARTags();
+            self.imageMask = image;
+        end        
+        function [robot,game] = GetPoses(self)
+            % Not yet implemented
+            robot = self.CVI.GetCamera2RobotTransformationMatrix();
+            game = self.CVI.GetCamera2GameTransformationMatrix();
         end
-        
-        function arTags = GetARTags(self)
-            arTags = self.CVI.G
+        function GeneratePathPoints(self)
+            cameraMatrix = self.CVI.GetCameraMatrix();
+            [normal, point] = GetGamePlane(self);
+            self.PEI.UpdatePath(self.imageMask, cameraMatrix, normal, point);
+        end
+        function GeneratePath(self, downsample, maxDistance, averaging, smoothing)
+            startGuess = self.RMRCI.GetRobotPose();
+            self.PEI.GeneratePath(downsample, startGuess, maxDistance);
+            self.pathPoints = self.PEI.GenerateSpline(averaging, smoothing);
+        end
+        function LoadTrajectory(self)
+            pathPoses = zeros(4,4,length(self.pathPoints));
+            for i = 1:length(self.pathPoints)
+                pathPoses(:,:,i) = transl(self.pathPoints(1,i),self.pathPoints(2,i),self.pathPoints(3,i));
+            end
+            self.RMRCI.UpdatePath(pathPoses);
+        end
+        function Run(self)
+            self.RMRCI.
         end
     end
     methods (Access = protected)

@@ -12,7 +12,9 @@ properties (Access = private)
 end
 methods (Access = public)
     function self = Path(debug)
-        self.debug = debug;
+        if ~isempty(debug)
+            self.debug = debug;
+        end
     end
     function UpdatePointCloud(self, x, y, z)
         self.pCloud = pointCloud([x;y;z]');
@@ -36,19 +38,19 @@ methods (Access = public)
             percentage = 1;
         end
         self.pCloud = pcdownsample(self.pCloud,'random',percentage);
-%         if self.debug
+        if self.debug
             size(self.pCloud.Location)
-%         end
+        end
     end
-    function GeneratePath(self, start_guess, max_distance)
-        P = start_guess;                    % Start location of trajectory
+    function GeneratePath(self, startGuess, maxDistance)
+        P = startGuess;                    % Start location of trajectory
         L = self.pCloud.Location;           % List of all points
         R = NaN(size(L));               % Final sorted list
         i = 1;
         while ~isempty(L)
             % Get distance between point and all other points;
             [dist,I] = min(pdist2(P,L));
-            if dist > max_distance
+            if dist > maxDistance
                 % Max distance between points exceeded!!
                 %   Either no points in main path left, or sampling is
                 %   too sparce.

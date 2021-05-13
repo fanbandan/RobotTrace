@@ -21,7 +21,7 @@ classdef Interface < handle
             if ~isempty(rosMode)
                 self.rosMode = rosMode;
             end
-            if self.rosMode == false
+            if self.rosMode == true
                 self.vision = ComputerVision.Vision(debug);
                 self.ar = ComputerVision.AR(debug);
             end
