@@ -65,16 +65,32 @@ classdef Interface < handle
     end
     methods (Access = public)
         function T = GetCamera2GameTransformationMatrix(self)
-            T = self.ar.GetGamePose();
+            if self.rosMode == true
+                T = self.ar.GetGamePose();
+            else
+                T = transl(0,0,0);
+            end
         end
         function T = GetGame2CameraTransformationMatrix(self)
-            T = inv(self.ar.GetGamePose());
+            if self.rosMode == true
+                T = inv(self.ar.GetGamePose());
+            else
+                T = transl(0,0,0);
+            end
         end
         function T = GetRobot2CameraTransformationMatrix(self)
-            T = inv(self.ar.GetRobotPose());
+            if self.rosMode == true
+                T = inv(self.ar.GetRobotPose());
+            else
+                T = transl(0,0,0);
+            end
         end
         function T = GetCamera2RobotTransformationMatrix(self)
-            T = self.ar.GetRobotPose();
+            if self.rosMode == true
+                T = self.ar.GetRobotPose();
+            else
+                T = transl(0,0,0);
+            end
         end
     end
     methods (Access = private)
