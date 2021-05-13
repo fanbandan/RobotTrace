@@ -4,21 +4,21 @@ classdef Interface < handle
     %   Creates cartesian path from an image in path coordinate frame.
     properties (Access = public)
     end
-    properties %(Access = private)
-        CVI ComputerVision.Interface
+    properties (Access = private)
         Path PathExtraction.Path
-        debug logical = false;
+        Debug logical = false;
         
         zNormal;
         zPoint;
     end
     methods (Access = public)
-        function self = Interface( debug)
-%             self.CVI = cvi;
-            self.debug = debug;
+        function self = Interface(debug)
             self.Path = PathExtraction.Path(debug);
+            if ~isempty(debug)
+                self.Debug = debug;
+            end
         end
-        function UpdatePath(self, image, CameraMatrix, zNormal, zPoint)
+        function UpdatePathMask(self, image, CameraMatrix, zNormal, zPoint)
             self.zNormal = zNormal;
             self.zPoint = zPoint;
             [pixelY,pixelX,~] = find(image); % check x and y!
@@ -26,16 +26,23 @@ classdef Interface < handle
             points = self.Pixels2Points(pixelX, pixelY, CameraMatrix);
             self.Path.UpdatePointCloud(points(1,:),points(2,:),points(3,:));
         end
-        function [x] = GetTrajectory(self)
-            %GetTrajectory returns the game path in cartesian coordinates.
+        function GeneratePath(self, downsample, startGuess, maxDistance)
+            self.Path.DownsamplePointCloud(downsample);
+            self.Path.GeneratePath(startGuess, maxDistance);
         end
-%         function [xDot] = GetXDot(self)
-%             %GetXDot returns the velocity path for RMRC.
-%             %   The game path derivate.
-%             x = GetTrajectory(self);
-%             deltaTime = 0.1;
-%             xDot = diff(x) / deltaTime;
-%         end
+        function GenerateSpline(averaging, smoothing)
+            if smoothing < 0 || smoothing > 1
+                error("Smoothing value must be between 0 and 1");
+            end
+            if averaging < 1
+                error("averaging must be greater than 1");
+            end
+            self.Path.PathSmoothing(averaging);
+            self.Path.SplineFitting(smoothing);
+        end
+        function [x] = GetTrajectory(self, samples)
+            x = self.Path.GetSplinePoints(samples);
+        end
     end
     methods (Access = private)
         function points = Pixels2Points(self, uMatrix, vMatrix, C)
