@@ -12,10 +12,19 @@ classdef Vision < handle
                 self.Debug = debug;
             end
         end
-        function maskedRGBImage = colourMask(self, RGB)
+        function image = GetImage(self)
+            camMsg = receive(self.CamSub, 0.1);
+            image = readImage(camMsg);
+            if self.Debug == true
+                imshow(image);
+            end
+        end
+    end
+    methods (Static)
+        function maskedRGBImage = colourMask(image)
             
             % Convert RGB image to chosen color space
-            I = rgb2hsv(RGB);
+            I = rgb2hsv(image);
             
             % Define thresholds for channel 1 based on histogram settings
             channel1Min = 0.940;
@@ -36,27 +45,20 @@ classdef Vision < handle
             BW = sliderBW;
             
             % Initialize output masked image based on input image.
-            maskedRGBImage = RGB;
+            maskedRGBImage = image;
             
             % Set background pixels where BW is false to zero.
             maskedRGBImage(repmat(~BW,[1 1 3])) = 0;
-            if self.Debug == true
-                imshow(maskedRGBImage);
-            end
+%             if self.Debug == true
+%                 imshow(maskedRGBImage);
+%             end
         end        
-        function edgeImage = edgeDetection(self, image)
+        function edgeImage = edgeDetection(image)
             %Canny Edge Detection
             edgeImage = edge(image,'canny');
-            if self.Debug == true
-                imshow(edgeImage);
-            end
-        end
-        function image = GetImage(self)
-            camMsg = receive(self.CamSub, 0.1);
-            image = readImage(camMsg);
-            if self.Debug == true
-                imshow(image);
-            end
+%             if self.Debug == true
+%                 imshow(edgeImage);
+%             end
         end
     end
 end
