@@ -37,15 +37,15 @@ while( toc < duration)
     I = eye(4);
     
     % Gain values for linear and angular velocity control
-    K_lin = 0.03;
+    K_lin = 0.02;
     K_ang = 0.05;
     
     vx = K_lin*axes(4); % x
     % wx = K_ang*(buttons(5)-buttons(6)); % roll
-    vy = K_lin*axes(5); % y
+    vy = K_lin*axes(2); % y
     % wy = K_ang*(axes(6)-axes(3)); % pitch
-    vz = K_lin*axes(2); % z
-    wz = K_ang*axes(1); % yaw
+    vz = K_lin*axes(1); % z
+    wz = K_ang*axes(5); % yaw
     % x = [vx; vy; vz; wx; wy; wz];
     x = [vx; vy; vz; wz];
     
