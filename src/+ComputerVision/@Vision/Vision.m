@@ -55,7 +55,7 @@ classdef Vision < handle
         end        
         function edgeImage = edgeDetection(image)
             %Canny Edge Detection
-            edgeImage = edge(image,'canny');
+            edgeImage = edge(image(:,:,3),'canny');
 %             if self.Debug == true
 %                 imshow(edgeImage);
 %             end

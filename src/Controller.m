@@ -36,12 +36,20 @@ classdef Controller < handle
         end
         function GeneratePathPoints(self, zDepthOverride)
             cameraMatrix = self.CVI.GetCameraMatrix();
-            [normal, point] = self.CVI.GetGamePlane(self, zDepthOverride);
-            self.PEI.UpdatePath(self.imageMask, cameraMatrix, normal, point);
+            if exist('zDepthOverride','var')
+                [normal, point] = self.CVI.GetGamePlane(zDepthOverride);
+            else
+                [normal, point] = self.CVI.GetGamePlane();
+            end
+            self.PEI.UpdatePathMask(self.imageMask, cameraMatrix, normal, point);
         end
         function GeneratePath(self, downsample, maxDistance, averaging, smoothing)
             startGuess = self.RMRCI.GetRobotPose();
-            self.PEI.GeneratePath(downsample, startGuess, maxDistance);
+            path = self.PEI.GeneratePath(downsample, startGuess, maxDistance);
+            if length(path) < 5
+                warning('No path found!');
+                return
+            end
             self.PEI.GenerateSpline(averaging, smoothing);
         end
         function ShowPath(self)

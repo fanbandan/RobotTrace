@@ -43,23 +43,19 @@ classdef Interface < handle
                 ];
         end
         function [normal, point] = GetGamePlane(self, zDepthOverride)
-            if self.rosMode == true
-                game = self.ar.GetGamePose();
-            else
-                game = transl(0,0,0);
-                if ~isempty(zDepthOverride)
-                    game(3) = zDepthOverride;
-                end
-            end
+            game = self.GetCamera2GameTransformationMatrix();
             position = transl(game);
-            orientation = [1, 0, 0]';
-            point = self.GetCameraMatrix() * position';
+            if exist('zDepthOverride','var')
+                position(3) = zDepthOverride;
+            end
+            orientation = [1, 0, 0];
+            point = self.GetCameraMatrix() * position;
             point = point';
             normal = orientation';
         end
         function UpdateARTags(self)
             if self.rosMode == true
-                self.ar.GetARTags(self);
+                self.ar.UpdateARTags();
             end
         end
     end
@@ -96,7 +92,7 @@ classdef Interface < handle
     methods (Access = private)
         function image = GetImage(self)
             if self.rosMode == true
-                image = self.vision.getImage();
+                image = self.vision.GetImage();
             else
                 % Change this to some default image
                 image = imread([pwd, '\data\lab_photos\5.jpg']);

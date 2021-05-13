@@ -65,7 +65,9 @@ classdef Interface < handle
         end
         function q = GetRobotJoints(self)
             if self.rosMode == true
-                q = self.dobotROS.GetCurrentJointState();
+                q1 = self.dobotROS.GetCurrentRailPos();
+                q2 = self.dobotROS.GetCurrentJointState();
+                q = [q1, q2'];
             else
                 q = self.dobot.GetPos();
             end

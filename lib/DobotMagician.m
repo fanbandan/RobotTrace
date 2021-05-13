@@ -42,6 +42,7 @@ classdef DobotMagician < handle
            % Initialise subs and pubs as object starts
 
            self.jointStateSub = rossubscriber('/dobot_magician/joint_states');
+           self.railPosSub = rossubscriber('/dobot_magician/rail_position');
            self.endEffectorStateSub = rossubscriber('/dobot_magician/end_effector_poses');
            
            self.ioStatusSub = rossubscriber('/dobot_magician/io_data');
@@ -105,6 +106,11 @@ classdef DobotMagician < handle
        function jointStates = GetCurrentJointState(self)
             latestJointStateMsg = self.jointStateSub.LatestMessage;
             jointStates = latestJointStateMsg.Position;
+       end
+       
+       function railPos = GetCurrentRailPos(self)
+            latestPosMsg = self.railPosSub.LatestMessage;
+            railPos = latestPosMsg.Data;           
        end
        
        function SetRobotOnRail(self,status)
