@@ -42,8 +42,15 @@ classdef Interface < handle
                 0,              0,          1; ...
                 ];
         end
-        function [normal, point] = GetGamePlane(self)
-            game = self.ar.GetGamePose();
+        function [normal, point] = GetGamePlane(self, zDepthOverride)
+            if self.rosMode == true
+                game = self.ar.GetGamePose();
+            else
+                game = transl(0,0,0);
+                if ~isempty(zDepthOverride)
+                    game(3) = zDepthOverride;
+                end
+            end
             position = transl(game);
             orientation = [1, 0, 0]';
             point = self.GetCameraMatrix() * position';
@@ -51,7 +58,9 @@ classdef Interface < handle
             normal = orientation';
         end
         function UpdateARTags(self)
-            self.ar.GetARTags(self);
+            if self.rosMode == true
+                self.ar.GetARTags(self);
+            end
         end
     end
     methods (Access = public)
