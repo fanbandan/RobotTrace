@@ -1,28 +1,18 @@
-function project()
+% function project()
     % Main File for launching project 2.
-
-    CV = ComputerVision.ComputerVisionInterface();
-    Pathing = PathExtraction.PathExtractionInterface(CV);
-    Move = RMRC.RMRCInterface(Pathing);
-    GUI = GUI.GUIInterace(Move);
-
-    % for image stuff: for sim use webcam, for real use usb_cam topic
-    
-    %% Arduino estop setup
-    a = arduino;
-    %% Arduino eStop
-    data = readDigitalPin(a,'D3');
-    if data == 1
-%         L.mlog = {L.DEBUG,'project','EStop'};
-        return
-    end
     %%
-
-
-
-    running = true;
-
-    while (running)
-        Move.DoSomething()
-    end
-end
+    controller = Controller(false, true);
+    controller.AcquireImageMask();
+    controller.GeneratePathPoints(1.8);
+    
+%     pause;
+    figure(105);
+    image = imread([pwd, '//data//demo.jpg']);
+    imshow(image(:,1:400,:));
+    controller.UpdatePathStartGuess([-0.204,-0.190,1.80]);
+    controller.GeneratePath(5000, 0.025, 1, 0.6);
+    h = figure(106);
+    axis equal;
+    set(gca, 'XDir','reverse')
+    controller.ShowPathSpline(h);
+% end
