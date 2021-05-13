@@ -5,23 +5,42 @@ classdef Interface < handle
         
     end
     properties (Access = private)
-        PEI PathExtraction.Interface
+        CVI ComputerVision.Interface
+        dobot RMRC.Dobot
+        motion RMRC.ResMotion
+        dobotROS DobotMagician
+        rosMode logical = true;
+        debug logical = false;
+        path;
     end
     methods (Access = public)
-        function self = Interface(pei)
-            self.PEI = pei;
+        function self = Interface(cvi, deltaT, debug, rosMode)
+            self.CVI = cvi;
+            self.dobot = RMRC.Dobot();
+            self.motion = RMRC.ResMotion(self.dobot, deltaT);
+            if ~isempty(debug)
+                self.debug = debug;
+            end
+            if ~isempty(rosMode)
+                self.rosMode = rosMode;
+            end
+            if self.rosMode == true
+                self.dobotROS = DobotMagician();
+            end
         end
-        function UpdatePath(self)
+        function GetRobotPose(self)
+            
+        end
+        function UpdatePath(self, path)
             %UpdatePath - Updates the game path
+            self.path = path;
         end
         function FollowPath(self)
             %FollowPath - begins RMRC and follows path to completion
-            resMotion = ResMotion(x_dot, traj, dobot, t, delta_t);
-            qMatrix = resMotion.RateControl(); 
-            % Control the robot using this qMatrix (steps, 3 links)
-            % Run lab 9 to understand function
+            transform = self.CVI.GetCamera2RobotTransformationMatrix();
+            
         end
     end
     methods (Access = private)
-    ends
+    end
 end
