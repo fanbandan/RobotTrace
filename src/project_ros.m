@@ -47,12 +47,12 @@ function project_ros()
     %% AR Tag detection
     tagMsg = receive(tagSub ,5); %Set to 5 second wait currently ----
     tagData = tagMsg(1).Poses;
-    tagSize = size(tagData , 2);
+    tagSize = size(tagData , 1);
     if tagSize > 1
-        tags = tagMsg(1).Markers;
+%         tags = tagMsg.Poses;
         %Need to sort which ar tag is which based of id ----------
-        gameTag = tags(1).pose.pose;
-        robotTag = tags(2).pose.pose;
+        gameTag = tags.Poses(1).pose;
+        robotTag = tags.Poses(2).pose;
         fprintf('gameTag: %d,%d,%d \n',gameTag.pose.position.x, gameTag.pose.position.y, gameTag.pose.position.z);
         fprintf('robotTag: %d,%d,%d \n',robotTag.pose.position.x, robotTag.pose.position.y, robotTag.pose.position.z);
         % for i=1:tagSize
