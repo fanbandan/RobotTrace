@@ -20,14 +20,6 @@ methods (Access = public)
         self.pCloud = pointCloud([x;y;z]');
         self.pCloudSource = self.pCloud;
     end
-    function ShowPointCloud(self, h)
-        figure(h);
-        pcshow(self.pCloud);
-    end
-    function ShowPath(self, h)
-        figure(h);
-        plot3(self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:));
-    end
     function DownsamplePointCloud(self,pointNumber)
         %DownsamplePointCloud - downsamples the point cloud for faster
         % trajectory construction. pointNumber sets the final number of
@@ -87,15 +79,36 @@ methods (Access = public)
         self.spline = [csx;csy;csz];
         self.bounds = [t(1);t(end)];
     end
-    function PlotSpline(self, h)
-        figure(h);
+    function PlotSpline(self, ax)
         t = 1:length(self.pathPoints);
         x = fnval(self.spline(1),t);
         y = fnval(self.spline(2),t);
         z = fnval(self.spline(3),t);
-        hold on;
-        plot3(self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:));
-        plot3(x,y,z);
+        hold(ax, 'on');
+        plot3(ax, self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:));
+        plot3(ax, x,y,z);
+    end
+    function ShowPointCloud(self, ax)
+        pcshow(ax, self.pCloud);
+    end
+    function ShowPath(self, ax)
+        plot3(ax, self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:));
+    end
+    function AnimatePath(self, ax)
+        image = self.pCloudSource.Location;
+%         plot(ax, image(:,1), image(:,2), '*');
+        points = self.pathPoints;
+        cameraMatrix = [ ...
+                665.578756,    0,          282.225564; ...
+                0,              664.605455, 260.138094; ...
+                0,              0,          1; ...
+                ];
+        pixels = cameraMatrix*points;
+        hold(ax, 'on');
+        for i = 1:length(self.pathPoints(1,:))-1
+            plot(ax, pixels(1,i:(i+1)),pixels(2,i:(i+1)),'*-g')
+            pause(0.05);
+        end
     end
     function points = GetSplinePoints(self, samples)
         t = linspace(self.bounds(1),self.bounds(2), samples);

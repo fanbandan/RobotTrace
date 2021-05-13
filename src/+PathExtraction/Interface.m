@@ -6,7 +6,7 @@ classdef Interface < handle
     end
     properties 
         Path PathExtraction.Path
-        Debug logical = false;
+        debug logical = false;
         
         zNormal;
         zPoint;
@@ -15,7 +15,7 @@ classdef Interface < handle
         function self = Interface(debug)
             self.Path = PathExtraction.Path(debug);
             if exist('debug','var')
-                self.Debug = debug;
+                self.debug = debug;
             end
         end
         function UpdatePathMask(self, image, CameraMatrix, zNormal, zPoint)
@@ -25,10 +25,16 @@ classdef Interface < handle
             
             points = self.Pixels2Points(pixelX, pixelY, CameraMatrix);
             self.Path.UpdatePointCloud(points(1,:),points(2,:),points(3,:));
+            if self.debug
+                self.ShowPointCloud(gca);
+            end
         end
         function path = GeneratePath(self, downsample, startGuess, maxDistance)
-%             self.Path.DownsamplePointCloud(downsample);
+            self.Path.DownsamplePointCloud(downsample);
             path = self.Path.GeneratePath(startGuess, maxDistance);
+            if self.debug
+                self.Path.AnimatePath(gca);
+            end
         end
         function GenerateSpline(self, averaging, smoothing)
             if smoothing < 0 || smoothing > 1
@@ -40,8 +46,11 @@ classdef Interface < handle
             self.Path.PathSmoothing(averaging);
             self.Path.SplineFitting(smoothing);
         end
-        function PlotSpline(self, h)
-            self.Path.PlotSpline(h);
+        function ShowPointCloud(self, ax)
+            self.Path.ShowPointCloud(ax);
+        end
+        function PlotSpline(self, ax)
+            self.Path.PlotSpline(ax);
         end
         function [x] = GetTrajectory(self, samples)
             x = self.Path.GetSplinePoints(samples);
