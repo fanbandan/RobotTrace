@@ -22,10 +22,10 @@ classdef Interface < handle
             self.dobot = RMRC.Dobot();
             self.deltaT = deltaT;
             self.motion = RMRC.ResMotion(self.dobot, self.deltaT);
-            if ~isempty(debug)
+            if exist('debug','var')
                 self.debug = debug;
             end
-            if ~isempty(rosMode)
+            if exist('rosMode','var')
                 self.rosMode = rosMode;
             end
             if self.rosMode == true

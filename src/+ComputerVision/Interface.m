@@ -15,10 +15,10 @@ classdef Interface < handle
     end
     methods (Access = public)
         function self = Interface(debug, rosMode)
-            if ~isempty(debug)
+            if exist('debug','var')
                 self.Debug = debug;
             end
-            if ~isempty(rosMode)
+            if exist('rosMode','var')
                 self.rosMode = rosMode;
             end
             if self.rosMode == true

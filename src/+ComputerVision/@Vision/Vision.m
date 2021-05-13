@@ -8,7 +8,7 @@ classdef Vision < handle
     methods (Access = public)
         function self = Vision(debug)
             self.CamSub = rossubscriber('/usb_cam/image_raw');
-            if ~isempty(debug)
+            if exist('debug','var')
                 self.Debug = debug;
             end
         end

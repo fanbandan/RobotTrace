@@ -14,7 +14,7 @@ classdef Interface < handle
     methods (Access = public)
         function self = Interface(debug)
             self.Path = PathExtraction.Path(debug);
-            if ~isempty(debug)
+            if exist('debug','var')
                 self.Debug = debug;
             end
         end
