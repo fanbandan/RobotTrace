@@ -7,7 +7,7 @@ classdef AR < handle
     end
     methods (Access = public)
         function self = AR(debug)
-            self.ARSub = rossubscriber('/usb_cam/image_raw');
+            self.ARSub = rossubscriber('/tags');
             if ~isempty(debug)
                 self.Debug = debug;
             end
@@ -22,7 +22,7 @@ classdef AR < handle
                     position = arTag(i).pose.position;
                     orientation = arTag(i).pose.orientation;
                     quat = Quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
-                    self.ARPoses(:,:,i) = transl(position.x, position.y, position.z) * quat.T;
+                self.ARPoses(:,:,i) = transl(position.x, position.y, position.z) * quat.T;
                 end
             end
         end
