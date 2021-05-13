@@ -12,6 +12,8 @@ function project_ros()
     ctl.AcquireImageMask();
     ctl.GeneratePathPoints(0.6);
     ctl.DownsamplePathPoints(2000);
+    controller.UpdatePathStartGuess(); % Auto mode
+%     controller.UpdatePathStartGuess([-0.204,-0.190,1.80]); %Manual Mode
     %%
     ctl.GeneratePath(0.05, 1, 0.6);
     ctl.ShowPath();
