@@ -103,20 +103,48 @@ classdef Dobot < RMRC.Robot
         function T = fkine(self, q)
             %fkine gets real robot end effector pose for real q values.
             %   Expects a 1x5 q vector
-            
-%             [valid,q] = self.verifyQ(q);
-%             if ~valid
-%                 warn('q value outside q limits, defaulting to nearest limit');
-%             end
-                        
-            l = self.a(3)*sin(q(3)) + self.a(4)*cos(q(4)) + self.a(5);
-            Z = self.d(2) + self.a(3)*cos(q(3)) - self.a(4)*sin(q(4));
-            Y = l*cos(q(2));
-            X = q(1) + l*sin(q(2));
-            Rz = q(2) + q(5);
-            Ry = 0;
-            Rx = 0;
-            T = transl(X,Y,Z)*trotz(Rz);
+            T = NaN(4,4,size(q,1));
+            for i = 1:size(q,1)
+                l = self.a(3)*sin(q(i,3)) + self.a(4)*cos(q(i,4)) + self.a(5);
+                Z = self.d(2) + self.a(3)*cos(q(i,3)) - self.a(4)*sin(q(i,4));
+                Y = l*cos(q(i,2));
+                X = q(i,1) + l*sin(q(i,2));
+                Rz = q(i,2) + q(i,5);
+                Ry = 0;
+                Rx = 0;
+                T(:,:,i) = transl(X,Y,Z)*trotz(Rz);
+            end
+            T = reshape(T,4,4,[]);
+        end
+        function [x,y,z] = A(self, q)
+            %A returns the x,y,z of the link joint determined by q;
+            switch(size(q,2))
+                case 1
+                    x = q(:,1);
+                    y = 0;
+                    z = 0;
+                    return;
+                case 2
+                    x = q(:,1);
+                    y = 0;
+                    z = self.d(2);     
+                    return;               
+                case 3
+                    x = q(:,1) + self.a(3)*sin(q(:,3))*sin(q(:,2));
+                    y = self.a(3)*sin(q(:,3))*cos(q(:,2));
+                    z = self.d(2) + self.a(3)*cos(q(:,3));
+                    return;
+                case 4
+                    x = q(:,1) + (self.a(3)*sin(q(:,3))+self.a(4)*cos(q(:,4)))*sin(q(:,2));
+                    y = (self.a(3)*sin(q(:,3))+self.a(4)*cos(q(:,4)))*cos(q(:,2));
+                    z = self.d(2) + self.a(3)*cos(q(:,3)) + self.a(4)*sin(q(:,4));
+                    return;
+                case 5
+                    x = q(:,1) + (self.a(3)*sin(q(:,3))+self.a(4)*cos(q(:,4))+self.a(5))*sin(q(:,2));
+                    y = (self.a(3)*sin(q(:,3))+self.a(4)*cos(q(:,4))+self.a(5))*cos(q(:,2));
+                    z = self.d(2) + self.a(3)*cos(q(:,3)) + self.a(4)*sin(q(:,4));
+                    return;
+            end
         end
         function [qstar, error, exitflag] = ikcon(self, T, q0)
             % check if Optimization Toolbox exists, we need it
