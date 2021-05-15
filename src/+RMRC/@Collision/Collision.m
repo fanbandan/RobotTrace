@@ -45,10 +45,10 @@ classdef Collision < handle
             [x4,y4,z4] = LinkKinematics(qMatrix(4));
             [x5,y5,z5] = LinkKinematics(qMatrix(5));
             
-            baseToq2 = [x2,y2,z2] - [x1,y1,z1];
-            q2Toq3 = [x3,y3,z3] - [x2,y2,z2];
-            q3Toq4 = [x4,y4,z4] - [x3,y3,z3];
-            q4Toq5 = [x5,y5,z5] - [x4,y4,z4];
+            baseToq2 = ([x2,y2,z2] + [x1,y1,z1])/2;
+            q2Toq3 = ([x3,y3,z3] + [x2,y2,z2])/2;
+            q3Toq4 = ([x4,y4,z4] + [x3,y3,z3])/2;
+            q4Toq5 = ([x5,y5,z5] + [x4,y4,z4])/2;
             radii = [1 2 3];
             %             [X,Y,Z] = ellipsoid( centerPoint(1), centerPoint(2), centerPoint(3), radii(1), radii(2), radii(3));
             [X,Y,Z] = ellipsoid( q4Toq5(1), q4Toq5(2), q4Toq5(3), radii(1), radii(2), radii(3));
