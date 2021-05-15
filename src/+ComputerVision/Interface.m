@@ -65,7 +65,7 @@ classdef Interface < handle
             if self.rosMode == true
                 T = self.ar.GetGamePose();
             else
-                T = transl(0.2,0.15,0);
+                T = transl(0.2,0.15,1.8);
             end
         end
         function T = GetGame2CameraTransformationMatrix(self)
@@ -86,7 +86,7 @@ classdef Interface < handle
             if self.rosMode == true
                 T = self.ar.GetRobotPose();
             else
-                T = transl(0.5,0.1,0.6);
+                T = trotz(pi/2)*transl(0.5,0.1,0.6);
             end
         end
     end

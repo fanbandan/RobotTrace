@@ -16,6 +16,8 @@ classdef Interface < handle
         initalised logical = false;
         path;
         environmentObjects cell = cell(0);
+        simHandle;
+        pathHandle;
     end
     methods (Access = public)
         function self = Interface(cvi, deltaT, rosMode, debug)
@@ -31,7 +33,13 @@ classdef Interface < handle
             end
             if self.rosMode == true
                 self.dobotROS = DobotMagician();
+            else
+                self.simHandle = figure();
+                gca(self.simHandle);
             end
+        end
+        function delete(self)
+            delete(self.simHandle);
         end
         function Initialise(self)
             if self.rosMode == true
@@ -52,6 +60,7 @@ classdef Interface < handle
                         self.dobotROS.PublishTargetJoint(joint_target);
                     else
                         self.dobot.Animate(qMatrix(i,:));
+                        drawnow;
                     end
                     pause(self.deltaT);
                 end
@@ -80,11 +89,13 @@ classdef Interface < handle
         function UpdatePath(self, path)
             %UpdatePath - Updates the game path
             self.path = path;
+            if self.rosMode == false
+                self.RenderPath()
+            end
         end
         function FollowPath(self)
             %FollowPath - begins RMRC and follows path to completion
-            transform = self.CVI.GetCamera2RobotTransformationMatrix();
-            x = self.path .* transform;
+            x = self.TranformPath();
             q0 = self.GetRobotJoints();
             qMatrix = self.motion.RateControl(x, q0);
             self.execute = true;
@@ -93,9 +104,11 @@ classdef Interface < handle
     end
     methods (Access = private)
         function GenerateSimEnvironment(self)
-            surf([-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
-            hold on;
-            Fence1 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,0.7,0.26), [0.4 0.6 0.7] );
+            figure(self.simHandle);
+            ax = gca(self.simHandle);
+            surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
+            hold(ax, 'on');
+            Fence1 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,0.5,0.26), [0.4 0.6 0.7] );
             self.environmentObjects{1} = Fence1;
             Fence2 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,-0.5,0.26), [0.4 0.6 0.7] );
             self.environmentObjects{2} = Fence2;
@@ -105,8 +118,24 @@ classdef Interface < handle
             self.environmentObjects{4} = Camera;
             self.dobot.PlotRobot([-1,1,-1,1,-1,1]);
             axis equal;
-            view(30,30);
-
+            view(ax,[30,30]);
+        end
+        function x = TranformPath(self)
+            transform = self.CVI.GetCamera2RobotTransformationMatrix();
+            x = self.path .* transform;
+        end
+        function RenderPath(self)
+            ax = gca(self.simHandle);
+            try 
+                delete(self.pathHandle);
+            end
+            tpath = self.TranformPath();
+            x = reshape(tpath(1,4,:),1,[]);
+            y = reshape(tpath(2,4,:),1,[]);
+            z = reshape(tpath(3,4,:),1,[]);
+            self.pathHandle = plot3(ax, ...
+                x, y, z, '-', 'Color', [0.9290 0.6940 0.1250], ...
+                'LineWidth', 4, 'DisplayName', 'trajectory');
         end
     end
 end
