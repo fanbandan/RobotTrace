@@ -31,10 +31,14 @@ classdef Controller < handle
             self.PEI = PathExtraction.Interface(self.debug);
             self.RMRCI = RMRC.Interface(self.CVI, deltaT, self.rosMode, self.debug);
         end
+        function Initialise(self)
+            self.RMRCI.Initialise();
+        end
         function image = AcquireImageMask(self)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            self.image = self.CVI.GetImageMask();
+            image = self.CVI.GetImageMask();
+            self.image = image;
             self.CVI.UpdateARTags();
             self.imageMask = self.image;
         end
