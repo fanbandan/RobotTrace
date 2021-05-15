@@ -15,6 +15,7 @@ classdef Interface < handle
         execute logical = false;
         initalised logical = false;
         path;
+        environmentObjects cell = cell(0);
     end
     methods (Access = public)
         function self = Interface(cvi, deltaT, rosMode, debug)
@@ -38,7 +39,7 @@ classdef Interface < handle
                 self.dobotROS.SetRobotOnRail(true);
                 self.dobotROS.InitaliseRobot();
             else
-                self.dobot.PlotRobot([-1,1,-1,1,-1,1]);
+                self.GenerateSimEnvironment();
             end
             self.initalised = true;
         end
@@ -91,5 +92,19 @@ classdef Interface < handle
         end
     end
     methods (Access = private)
+        function GenerateSimEnvironment(self)
+            surf([-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
+            hold on;
+            Fence1 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,0.5,0.26), [0.4 0.6 0.7] );
+            self.environmentObjects{1} = Fence1;
+            Fence2 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,-0.5,0.26), [0.4 0.6 0.7] );
+            self.environmentObjects{2} = Fence2;
+            Table =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Table.ply'],transl(0.5,0,0), [1 0.3 0.1] );
+            self.environmentObjects{3} = Table;
+            self.dobot.PlotRobot([-1,1,-1,1,-1,1]);
+            axis equal;
+            view(30,30);
+
+        end
     end
 end

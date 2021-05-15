@@ -7,10 +7,12 @@
     
     %%
     controller = Controller(false, true);
+    controller.Initialise();
+    %%
     controller.AcquireImageMask();
     controller.GeneratePathPoints(1.8);
     controllder.DownsamplePathPoints(5000);
-    
+    %%
 %     pause;
     figure(105);
     image = imread([pwd, '//data//demo.jpg']);
