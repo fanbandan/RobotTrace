@@ -116,7 +116,7 @@ classdef Dobot < RMRC.Robot
             end
             T = reshape(T,4,4,[]);
         end
-        function [x,y,z] = A(self, q)
+        function [x,y,z] = LinkKinematics(self, q)
             %A returns the x,y,z of the link joint determined by q;
             switch(size(q,2))
                 case 1
