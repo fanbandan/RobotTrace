@@ -1,6 +1,11 @@
 % function project()
     % Main File for launching project 2.
     %%
+    rosMode = false;
+    debug = false;    
+    GUI.GUI(rosMode, debug);
+    
+    %%
     controller = Controller(false, true);
     controller.AcquireImageMask();
     controller.GeneratePathPoints(1.8);
