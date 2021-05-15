@@ -20,7 +20,7 @@ classdef Controller < handle
         function self = Controller(rosMode, debug)
             %CONTROLLER Construct an instance of this class
             %   Detailed explanation goes here
-            deltaT = 0.2;
+            deltaT = 0.05;
             if exist('debug','var')
                 self.debug = debug;
             end
@@ -93,8 +93,8 @@ classdef Controller < handle
             self.pathPoints = path;
         end
         function LoadTrajectory(self)
-            pathPoses = zeros(4,4,length(self.pathPoints));
-            for i = 1:length(self.pathPoints)
+            pathPoses = zeros(4,4,size(self.pathPoints,2));
+            for i = 1:size(self.pathPoints,2)
                 pathPoses(:,:,i) = transl(self.pathPoints(1,i),self.pathPoints(2,i),self.pathPoints(3,i));
             end
             self.RMRCI.UpdatePath(pathPoses);
