@@ -85,30 +85,36 @@ methods (Access = public)
         y = fnval(self.spline(2),t);
         z = fnval(self.spline(3),t);
         hold(ax, 'on');
-        plot3(ax, self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:));
-        plot3(ax, x,y,z);
+        self.ShowPath(ax);
+        plot3(ax, ... 
+            x, y, z, ':', 'Color', [0.9290 0.6940 0.1250], ... 
+            'LineWidth', 2, 'DisplayName', 'spline path');
+        hold(ax, 'off');
     end
     function ShowPointCloud(self, ax)
-        scatter3(ax, self.pCloudSource.Location(:,1),self.pCloudSource.Location(:,2),self.pCloudSource.Location(:,3), '.');
-        hold(ax)
-        scatter3(ax, self.pCloud.Location(:,1),self.pCloud.Location(:,2),self.pCloud.Location(:,3), '.');
+        scatter3(ax, ...
+            self.pCloudSource.Location(:,1), self.pCloudSource.Location(:,2), self.pCloudSource.Location(:,3), ...
+            [], [0 0.4470 0.7410], '.', 'DisplayName', 'orginal');
+        hold(ax, 'on');
+        scatter3(ax, ...
+            self.pCloud.Location(:,1),self.pCloud.Location(:,2),self.pCloud.Location(:,3), ...
+            [], [0.4940 0.1840 0.5560], '.', 'DisplayName', 'downsampled');
+        hold(ax, 'off');
+        view(ax,[0,90]);
     end
     function ShowPath(self, ax)
-        plot3(ax, self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:));
+        plot3(ax, ... 
+            self.pathPoints(1,:),self.pathPoints(2,:),self.pathPoints(3,:), ...
+            '-', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2, 'DisplayName', 'raw path');
+        view(ax,[0,90]);
     end
     function AnimatePath(self, ax)
         image = self.pCloudSource.Location;
-%         plot(ax, image(:,1), image(:,2), '*');
-        points = self.pathPoints;
-        cameraMatrix = [ ...
-                665.578756,    0,          282.225564; ...
-                0,              664.605455, 260.138094; ...
-                0,              0,          1; ...
-                ];
-        pixels = cameraMatrix*points;
+        scatter(ax, image(:,1), image(:,2), [], [0.4940 0.1840 0.5560], '.');
         hold(ax, 'on');
+        view(ax,[0,90]);
         for i = 1:length(self.pathPoints(1,:))-1
-            plot(ax, pixels(1,i:(i+1)),pixels(2,i:(i+1)),'*-g')
+            plot(ax, pixels(1,i:(i+1)),pixels(2,i:(i+1)), 'Color', [0.4660 0.6740 0.1880], '*-')
             pause(0.05);
         end
     end

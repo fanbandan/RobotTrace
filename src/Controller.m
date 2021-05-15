@@ -82,7 +82,7 @@ classdef Controller < handle
             if exist('manualGuess','var')
                 self.pathStartGuess = manualGuess;
             else
-                self.pathStartGuess = self.RMRCI.GetRobotPose();
+                self.pathStartGuess = transl(self.RMRCI.GetRobotPose())';
             end
         end
         function startGuess = GetPathStartGuess(self)
@@ -113,9 +113,16 @@ classdef Controller < handle
         end
         function ShowPathPointCloud(self, ax)
             self.PEI.ShowPointCloud(ax);
+            hold(ax, 'on');
+            scatter3(ax, ...
+                self.pathStartGuess(1), self.pathStartGuess(2), self.pathStartGuess(3), ...
+                [], [0.4660 0.6740 0.1880], 'o', 'DisplayName', 'start guess');
+            hold(ax, 'off');
+            legend(ax,'Location','northeast');
         end
         function ShowPathSpline(self, ax)
             self.PEI.PlotSpline(ax);
+            legend(ax,'Location','northeast');
         end
     end
     methods (Access = protected)
