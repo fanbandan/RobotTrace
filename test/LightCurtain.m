@@ -1,5 +1,16 @@
 %% Safety Light Curtain Restraints
 
+clf;
+
+% Set up robot for sim
+dobot = RMRC.Dobot();
+workspace = [-1,1,-1,1,-1,1];
+qn = [0, deg2rad([0, 5, 0, 0])];
+% q is optional.
+dobot.PlotRobot(workspace,qn);
+axis equal
+q0 = qn;
+
 % Set/Create Parameters
 intersect = false;
 noOfPlane = 6;
@@ -8,8 +19,8 @@ intersectionPoint = [0 0 0];
 
 % Create a plan at all 6 walls of the workspace cube by obtaining the
 % workspace dimensions
-planePoint = [0.9; 0; 0];
-planeNormal = [0; 0; 0];
+planePoint = [0.5; 0; 0];
+planeNormal = [0.1; 0; 0];
 
 % Get the points within the current trajectory and number of points
 x = zeros(4,4,noOfTrajPoints);
@@ -19,6 +30,8 @@ end
 
 % Check for intersection of points with the planes
 for i = 1:noOfTrajPoints-1
+    T = x(:,:,i);
+    q = dobot.ikcon(T,q0);
     % for j = (1:planes) ------------------- When have multiple planes
     trajPoint1 = x(1:3,4,i);
     trajPoint2 = x(1:3,4,i+1);
@@ -42,7 +55,7 @@ for i = 1:noOfTrajPoints-1
     
     % compute the intersection parameter
     sI = N / D;
-    intersectionPoint = point1OnLine + sI.*u;
+    intersectionPoint = trajPoint1 + sI.*u;
     
     if (sI < 0 || sI > 1)
         check = 3;          %The intersection point lies outside the segment, so there is no intersection
@@ -55,5 +68,8 @@ for i = 1:noOfTrajPoints-1
         % stop dobot
         break;
     end
+    dobot.Animate(q);
+    pause(1);
+    q0 = q;
     % end ---------------------------------- When have multiple planes
 end
