@@ -130,8 +130,7 @@ classdef Interface < handle
             self.arRobotTF = transl(0.5,0,0.5);
             set(self.arRobotH,'Matrix',self.arRobotTF);
             drawnow;
-            
-       
+              
             Fence1 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,0.5,0.26), [0.4 0.6 0.7] );
             self.environmentObjects{1} = Fence1;
             Fence2 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,-0.5,0.26), [0.4 0.6 0.7] );
