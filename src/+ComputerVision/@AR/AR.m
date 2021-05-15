@@ -36,14 +36,14 @@ classdef AR < handle
             if length(self.arTags) >= self.expectedTagNumber
                 robotPose = self.arPoses(:,:,1);
             else
-                robotPose = transl(0,0,0);
+                robotPose = NaN(4,4);
             end
         end
         function gamePose = GetGamePose(self)
             if length(self.arPoses) >= self.expectedTagNumber
                 gamePose = self.arPoses(:,:,2);
             else
-                gamePose = transl(0,0,0);
+                gamePose = NaN(4,4);
             end
         end
     end
