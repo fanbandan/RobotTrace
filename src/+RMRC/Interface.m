@@ -114,6 +114,8 @@ classdef Interface < handle
             self.environmentObjects{2} = Fence2;
             Table =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Table.ply'],transl(0.5,0,0), [1 0.3 0.1] );
             self.environmentObjects{3} = Table;
+            Camera =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//camera.ply'],transl(0.3,0.6,0.2)*trotx(pi/2), [0 0 1] );
+            self.environmentObjects{4} = Camera;
             self.dobot.PlotRobot([-1,1,-1,1,-1,1]);
             axis equal;
             view(ax,[30,30]);
