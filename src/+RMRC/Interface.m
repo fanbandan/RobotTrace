@@ -18,6 +18,10 @@ classdef Interface < handle
         environmentObjects cell = cell(0);
         simHandle;
         pathHandle;
+        arGameTF;
+        arGameH;
+        arRobotTF;
+        arRobotH;
     end
     methods (Access = public)
         function self = Interface(cvi, deltaT, rosMode, debug)
@@ -108,8 +112,26 @@ classdef Interface < handle
             ax = gca(self.simHandle);
             surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
             hold(ax, 'on');
-            surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//game.PNG']),'FaceColor','texturemap');
-            surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//robot.PNG']),'FaceColor','texturemap');
+            
+            h = 0.1;
+            [x,z] = meshgrid(-h/2:h/4:h/2,-h/2:h/4:h/2);
+            y = 0.01*ones(size(x));
+            arGameImage = imread([pwd, '//src//+RMRC//Environment//game.PNG']);
+            self.arGameH = hgtransform('Parent',ax);
+            game = surf(x,y,z,'CData',arGameImage,'FaceColor','texturemap','EdgeColor','none');
+            set(game,'Parent',self.arGameH);
+            self.arGameTF = transl(0,0,0.5);
+            set(self.arGameH,'Matrix',self.arGameTF);
+            
+            arRobotImage = imread([pwd, '//src//+RMRC//Environment//robot.PNG']);
+            self.arRobotH = hgtransform('Parent',ax);
+            game = surf(x,y,z,'CData',arRobotImage,'FaceColor','texturemap','EdgeColor','none');
+            set(game,'Parent',self.arRobotH);
+            self.arRobotTF = transl(0.5,0,0.5);
+            set(self.arRobotH,'Matrix',self.arRobotTF);
+            drawnow;
+            
+       
             Fence1 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,0.5,0.26), [0.4 0.6 0.7] );
             self.environmentObjects{1} = Fence1;
             Fence2 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,-0.5,0.26), [0.4 0.6 0.7] );
@@ -146,6 +168,13 @@ classdef Interface < handle
             xlabel(ax,"X");
             ylabel(ax,"Y");
             zlabel(ax,"Z");
+        end
+        function ARRender(self, gameTF, robotTF)
+            self.arGameTF = gameTF;
+            self.arRobotTF = robotTF;
+            set(self.arGameH,'Matrix',self.arGameTF);
+            set(self.arRobotH,'Matrix',self.arRobotTF);
+            drawnow;       
         end
     end
 end
