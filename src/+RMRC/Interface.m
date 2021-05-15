@@ -105,6 +105,11 @@ classdef Interface < handle
             self.execute = true;
             self.MoveRobot(qMatrix);
         end
+        function ShowARTags(self,game,robot)
+            if self.rosMode == false
+                self.ARRender(game, robot)
+            end
+        end
     end
     methods (Access = private)
         function GenerateSimEnvironment(self)

@@ -44,9 +44,9 @@ classdef Controller < handle
             self.imageMask = self.image;
         end
         function [robot,game] = GetPoses(self)
-            % Not yet implemented
             robot = self.CVI.GetCamera2RobotTransformationMatrix();
             game = self.CVI.GetCamera2GameTransformationMatrix();
+            self.RMRCI.ShowARTags(game,robot);
         end
         function points = GeneratePathPoints(self, zDepthOverride)
             cameraMatrix = self.CVI.GetCameraMatrix();
