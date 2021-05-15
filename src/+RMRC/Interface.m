@@ -108,6 +108,8 @@ classdef Interface < handle
             ax = gca(self.simHandle);
             surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
             hold(ax, 'on');
+            surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//game.PNG']),'FaceColor','texturemap');
+            surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//robot.PNG']),'FaceColor','texturemap');
             Fence1 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,0.5,0.26), [0.4 0.6 0.7] );
             self.environmentObjects{1} = Fence1;
             Fence2 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,-0.5,0.26), [0.4 0.6 0.7] );
@@ -116,7 +118,7 @@ classdef Interface < handle
             self.environmentObjects{3} = Table;
             Camera =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//camera.ply'],transl(0.3,0.6,0.2)*trotx(pi/2), [0 0 1] );
             self.environmentObjects{4} = Camera;
-            self.dobot.PlotRobot([-1,1,-1,1,-1,1]);
+            self.dobot.PlotRobot([-1,1,-1,1,0,1]);
             axis equal;
             view(ax,[30,30]);
         end
