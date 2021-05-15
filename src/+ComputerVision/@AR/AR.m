@@ -10,6 +10,7 @@ classdef AR < handle
     methods (Access = public)
         function self = AR(debug)
             self.ARSub = rossubscriber('/tags');
+            self.TimerSetup()
             if ~isempty(debug)
                 self.debug = debug;
             end
@@ -53,6 +54,8 @@ classdef AR < handle
             t.TimerFcn = @(~, ~) self.TimerUpdate();
             t.Period = self.timerPeriod;
             t.ExecutionMode = 'fixedDelay';
+            self.timerObject = t;
+            start(self.timerObject);
         end
         function TimerUpdate(self)
             self.UpdateARTags();
