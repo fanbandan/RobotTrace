@@ -81,6 +81,7 @@ classdef Dobot < RMRC.Robot
                 q(4) = pi/2 - q(3) + q(4);
             else 
                 q = [q(1:4), 0, q(5)];
+                q(2) = -q(2);
                 q(5) = pi - q(4);
                 q(4) = pi/2 - q(3) + q(4);
             end
@@ -91,12 +92,14 @@ classdef Dobot < RMRC.Robot
         end
         function Animate(self, q)
             q = [q(:,1:4), zeros(size(q,1),1), q(:,5)];
+            q(:,2) = - q(:,2);
             q(:,5) = pi - q(:,4);
             q(:,4) = pi/2 - q(:,3) + q(:,4);
             self.Model.animate(q);
         end
         function q = GetPos(self)
             q = self.Model.getpos();
+            q(2) = -q(2);
             q(4) = q(4) - pi/2 + q(3);
             q = [q(1:4), q(6)];
         end
@@ -137,12 +140,12 @@ classdef Dobot < RMRC.Robot
                 case 4
                     x = q(:,1) + (self.a(3)*sin(q(:,3))+self.a(4)*cos(q(:,4)))*sin(q(:,2));
                     y = (self.a(3)*sin(q(:,3))+self.a(4)*cos(q(:,4)))*cos(q(:,2));
-                    z = self.d(2) + self.a(3)*cos(q(:,3)) + self.a(4)*sin(q(:,4));
+                    z = self.d(2) + self.a(3)*cos(q(:,3)) - self.a(4)*sin(q(:,4));
                     return;
                 case 5
                     x = q(:,1) + (self.a(3)*sin(q(:,3))+self.a(4)*cos(q(:,4))+self.a(5))*sin(q(:,2));
                     y = (self.a(3)*sin(q(:,3))+self.a(4)*cos(q(:,4))+self.a(5))*cos(q(:,2));
-                    z = self.d(2) + self.a(3)*cos(q(:,3)) + self.a(4)*sin(q(:,4));
+                    z = self.d(2) + self.a(3)*cos(q(:,3)) - self.a(4)*sin(q(:,4));
                     return;
             end
         end
