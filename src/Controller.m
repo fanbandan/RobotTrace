@@ -30,6 +30,7 @@ classdef Controller < handle
             self.CVI = ComputerVision.Interface(self.rosMode, self.debug);
             self.PEI = PathExtraction.Interface(self.debug);
             self.RMRCI = RMRC.Interface(self.CVI, deltaT, self.rosMode, self.debug);
+            self.pathStartGuess = [0,0,0];
         end
         function Initialise(self)
             self.RMRCI.Initialise();
@@ -83,6 +84,9 @@ classdef Controller < handle
             else
                 self.pathStartGuess = self.RMRCI.GetRobotPose();
             end
+        end
+        function startGuess = GetPathStartGuess(self)
+            startGuess = self.pathStartGuess;
         end
         function path = GetTrajectory(self, samples)
             path = self.PEI.GetTrajectory(samples);
