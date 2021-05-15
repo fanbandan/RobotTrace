@@ -120,10 +120,14 @@ classdef Interface < handle
         end
         function x = TranformPath(self)
             transform = self.CVI.GetCamera2RobotTransformationMatrix();
-            x = self.path .* transform;
+            x = NaN(size(self.path));
+            for i = 1:size(self.path,3)
+                x(:,:,i) = transform * self.path(:,:,i);
+            end
         end
         function RenderPath(self)
             ax = gca(self.simHandle);
+%             ax = gca(figure(3));
             try 
                 delete(self.pathHandle);
             end
@@ -133,7 +137,11 @@ classdef Interface < handle
             z = reshape(tpath(3,4,:),1,[]);
             self.pathHandle = plot3(ax, ...
                 x, y, z, '-', 'Color', [0.9290 0.6940 0.1250], ...
-                'LineWidth', 4, 'DisplayName', 'trajectory');
+                'LineWidth', 2, 'DisplayName', 'trajectory');
+            
+            xlabel(ax,"X");
+            ylabel(ax,"Y");
+            zlabel(ax,"Z");
         end
     end
 end
