@@ -45,7 +45,7 @@ classdef Dobot < RMRC.Robot
             L(2) = Link([0      0.08    0       pi/2    0]);
             L(3) = Link([0      0       0.135   0       0]);
             L(4) = Link([0      0       0.160   0       0]);
-            L(5) = Link([0      0       0       -pi/2    0]);
+            L(5) = Link([0      0       0       -pi/2   0]);
             L(6) = Link([0      0       0       0       0]);
             
             % Incorporate joint limits
