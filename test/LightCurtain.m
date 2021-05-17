@@ -2,24 +2,22 @@
 
 clf;
 
-% Set up robot for sim
-dobot = RMRC.Dobot();
-workspace = [-1,1,-1,1,-1,1];
-qn = [0, deg2rad([0, 5, 0, 0])];
-% q is optional.
-dobot.PlotRobot(workspace,qn);
-axis equal
-q0 = qn;
-hold on;
-
 % Set/Create Parameters
 intersect = false;
 noOfPlane = 6;
 noOfTrajPoints = 100;
 intersectionPoint = [0 0 0];
 
-% Create a plane at all 6 walls of the workspace cube by obtaining the
-% workspace dimensions
+%% Set up robot for sim
+dobot = RMRC.Dobot();
+workspace = [-1,1,-1,1,-1,1];
+qn = [0, deg2rad([0, 5, 0, 0])];
+dobot.PlotRobot(workspace,qn);
+axis equal
+q0 = qn;
+hold on;
+
+%% Create a plane
 planePoint = [0.9; 0; 0];
 planeNormal = [0.1; 0; 0];
 normal = [0.1, 0, 0];
@@ -32,19 +30,17 @@ z = planePoint(3,1) + w(3,1) * P + w(3,2) * Q;
 hold on
 surf(x,y,z);
 drawnow;
-%%
 
-% Get the points within the current trajectory and number of points
+%% Get the points within the current trajectory and number of points
 x = zeros(4,4,noOfTrajPoints);
 for i = 1:noOfTrajPoints
     x(:,:,i) = transl(i/100, 0.15 + 0.1*sin(i*2*pi*0.05), 0.15 +  0.1*cos(i*2*pi*0.05));
 end
 
-% Check for intersection of points with the planes
+%% Check for intersection of points with the planes
 for i = 1:noOfTrajPoints-1
     T = x(:,:,i);
     q = dobot.ikcon(T,q0);
-    % for j = (1:planes) ------------------- When have multiple planes
     trajPoint1 = x(1:3,4,i);
     trajPoint2 = x(1:3,4,i+1);
     % LinePlaneIntersection
@@ -84,5 +80,4 @@ for i = 1:noOfTrajPoints-1
     dobot.Animate(q);
     pause(0.2);
     q0 = q;
-    % end ---------------------------------- When have multiple planes
 end
