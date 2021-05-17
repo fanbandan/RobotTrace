@@ -41,7 +41,7 @@ methods (Access = public)
         i = 1;
         while ~isempty(L)
             % Get distance between point and all other points;
-            [dist,I] = min(pdist2(P,L));
+            [dist,I] = min(pdist2B(P,L));
             if dist > maxDistance
                 % Max distance between points exceeded!!
                 %   Either no points in main path left, or sampling is
