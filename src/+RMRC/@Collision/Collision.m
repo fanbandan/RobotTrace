@@ -12,25 +12,17 @@ classdef Collision < handle
         function self = Collision(robot)
             self.robot = robot;
         end
-        function CheckCollision(self, q)
-            
-            %%
+        function collision = CheckCollision(self, q)
             [x(1),y(1),z(1)] = self.robot.LinkKinematics(q(1:1));
             [x(2),y(2),z(2)] = self.robot.LinkKinematics(q(1:2));
             [x(3),y(3),z(3)] = self.robot.LinkKinematics(q(1:3));
             [x(4),y(4),z(4)] = self.robot.LinkKinematics(q(1:4));
             [x(5),y(5),z(5)] = self.robot.LinkKinematics(q(1:5));
             
-            figure(1);
-            clf;
-            self.robot.PlotRobot([-1,1,-1,1,-1,1],q);
-            
-            H = hgtransform('Parent',gca);
-            hold on;
-            cube_h = plot3(self.collisionPoints(:,1),self.collisionPoints(:,2),self.collisionPoints(:,3),'b.');
-            
             tr = zeros(4,4,3);
             radii = [0.1,0.025,0.025];
+            
+            collision = false;
             
             for i = 1:3
                 position = ([x(i+1),y(i+1),z(i+1)] + [x(i),y(i),z(i)])/2;
@@ -41,18 +33,17 @@ classdef Collision < handle
                 angleZ = atan2(dy,dx);
                 angleY = atan2(dz,L);
                 T = transl(position(1),position(2),position(3))*trotz(angleZ)*troty(-angleY);
-%                 trplot(T);
                 tr(:,:,i) = T;
-                [X,Y,Z] = ellipsoid(0,0,0,radii(1),radii(2),radii(3));
-                ellipsoidAtOrigin_h = surf(X,Y,Z);
-                set(ellipsoidAtOrigin_h,'Parent',H);
-                set(H,'Matrix',T);
-                pause;
+                
                 cubePointsAndOnes = [inv(tr(:,:,i)) * [self.collisionPoints,ones(size(self.collisionPoints,1),1)]']';
                 transformedPoints = cubePointsAndOnes(:,1:3);
                 algebraicDist = self.GetAlgebraicDist(transformedPoints, position, radii);
                 pointsInside = find(algebraicDist < 1);
-                disp(['2.10: There are ', num2str(size(pointsInside,1)),' points inside the ',num2str(i),'th ellipsoid']);
+                if ~isempty(pointsInside)
+                    disp(['There are ', num2str(size(pointsInside,1)),' points inside the ',num2str(i),'th ellipsoid']);
+                    collision = true;
+                    return;
+                end
             end
         end
         function GenerateCube(self, x, y, z)
