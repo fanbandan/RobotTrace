@@ -38,6 +38,7 @@ classdef EStop < handle
             t.TimerFcn = @(~, ~) self.TimerUpdate();
             t.Period = self.timerPeriod;
             t.ExecutionMode = 'fixedDelay';
+            t.BusyMode = 'queue';
             self.timerObject = t;
             start(self.timerObject);
         end

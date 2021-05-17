@@ -80,6 +80,7 @@ classdef Interface < handle
         function Stop(self)
             self.execute = false;
             self.initalised  = false;
+            disp("Stopping Robot");
             if self.rosMode == true
                 self.dobotROS.EStopRobot();
             end
