@@ -4,5 +4,7 @@
 clear all
 close all
 addpath(genpath(pwd), '-begin');
+delete(timerfindall);
+clc;
 
 workspace = pwd;
