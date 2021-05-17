@@ -59,11 +59,11 @@ classdef Interface < handle
             self.initalised = true;
         end
         function MoveRobot(self,qMatrix)
-            for i = 1:size(qMatrix,1)
-                
-                RMRC.CheckCollition(qMatrix(i));
-                
-                if self.execute == true && self.initalised == true      
+            for i = 1:size(qMatrix,1)                
+                if self.execute == true && self.initalised == true
+                    if self.collision.CheckCollition(qMatrix(i,:)) == true
+                        self.Stop();
+                    end
                     if self.rosMode == true
                         joint_target = [qMatrix(i,2) qMatrix(i,3) qMatrix(i,4) qMatrix(i,5)];
                         self.dobotROS.MoveRailToPosition(qMatrix(i,1));
