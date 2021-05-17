@@ -10,6 +10,7 @@ qn = [0, deg2rad([0, 5, 0, 0])];
 dobot.PlotRobot(workspace,qn);
 axis equal
 q0 = qn;
+hold on;
 
 % Set/Create Parameters
 intersect = false;
@@ -17,10 +18,21 @@ noOfPlane = 6;
 noOfTrajPoints = 100;
 intersectionPoint = [0 0 0];
 
-% Create a plan at all 6 walls of the workspace cube by obtaining the
+% Create a plane at all 6 walls of the workspace cube by obtaining the
 % workspace dimensions
-planePoint = [0.5; 0; 0];
+planePoint = [0.9; 0; 0];
 planeNormal = [0.1; 0; 0];
+normal = [0.1, 0, 0];
+
+w = null(normal);
+[P,Q] = meshgrid(-2:2);
+x = planePoint(1,1) + w(1,1) * P + w(1,2) * Q;
+y = planePoint(2,1) + w(2,1) * P + w(2,2) * Q;
+z = planePoint(3,1) + w(3,1) * P + w(3,2) * Q;
+hold on
+surf(x,y,z);
+drawnow;
+%%
 
 % Get the points within the current trajectory and number of points
 x = zeros(4,4,noOfTrajPoints);
@@ -66,10 +78,11 @@ for i = 1:noOfTrajPoints-1
     end
     if intersect == true
         % stop dobot
+        disp("Light Curtain Breached! Robot Operation Shut Down!");
         break;
     end
     dobot.Animate(q);
-    pause(1);
+    pause(0.2);
     q0 = q;
     % end ---------------------------------- When have multiple planes
 end
