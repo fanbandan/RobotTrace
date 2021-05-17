@@ -92,6 +92,19 @@ classdef Interface < handle
                 q = self.dobot.GetPos();
             end
         end
+        function qlim = GetRobotJointLimits(self)
+            qlim = self.dobot.qlim;
+        end
+        function SetRobotJoints(self,q)
+            if self.rosMode == true
+                joint_target = [q(2) q(3) q(4) q(5)];
+                self.dobotROS.MoveRailToPosition(q(1));
+                self.dobotROS.PublishTargetJoint(joint_target);
+            else
+                self.dobot.Animate(q);
+                drawnow;
+            end
+        end
         function pose = GetRobotPose(self)
             q = self.GetRobotJoints();
             pose = self.dobot.fkine(q);
