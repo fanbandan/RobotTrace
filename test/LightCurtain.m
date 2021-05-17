@@ -38,12 +38,13 @@ for i = 1:noOfTrajPoints
 end
 
 %% Check for intersection of points with the planes
+% Based on Gavin Paul's LinePlaneIntersection.m from Lab 5 of 41013
+% Robotics
 for i = 1:noOfTrajPoints-1
     T = x(:,:,i);
     q = dobot.ikcon(T,q0);
     trajPoint1 = x(1:3,4,i);
     trajPoint2 = x(1:3,4,i+1);
-    % LinePlaneIntersection
     % Given a plane (normal and point) and two points that make up another line, get the intersection
     u = trajPoint2 - trajPoint1;
     w = trajPoint1 - planePoint;

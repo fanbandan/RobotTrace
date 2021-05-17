@@ -1,7 +1,7 @@
 %% This script allows for the jogging of the Dobot with an XBoz controller
 clf;
 %% Setup joystick
-id = 1; % Note: may need to be changed if multiple joysticks present
+id = 1;
 joy = vrjoystick(id);
 caps(joy) % display joystick information
 
@@ -25,10 +25,10 @@ send(railStatusPublisher,railStatusMsg);
 % Reinitialise
 dobot.InitialiseRobot();
 % Move robot in loop
-    joint_target = [qMatrix(i,2) qMatrix(i,3) qMatrix(i,4) qMatrix(i,5)];
-    dobot.MoveRailToPosition(qMatrix(i,1));
-    dobot.PublishTargetJoint(joint_target);
-    
+joint_target = [qMatrix(i,2) qMatrix(i,3) qMatrix(i,4) qMatrix(i,5)];
+dobot.MoveRailToPosition(qMatrix(i,1));
+dobot.PublishTargetJoint(joint_target);
+
 % Move to the position of qMatrix(1,i)
 railPosMsg.Data = position;
 send(railPosPub,railPosMsg);
@@ -40,7 +40,7 @@ HF = figure(1);         % Initialise figure to display robot
 dobot.Animate(q);          % Plot robot in initial configurationq
 set(HF,'Position',[0.1 0.1 0.8 0.8]);
 
-duration = 1000;  % Set duration of the simulation (seconds)  
+duration = 1000;  % Set duration of the simulation (seconds)
 dt = 1;      % Set time step for simulation (seconds)
 
 n = 0;  % Initialise step count to zero
@@ -72,11 +72,11 @@ while( toc < duration)
     J = dobot.jacob(q(end,:));
     J(4:5, :) = [];
     J(:,5) = [];
-
+    
     JDLS = inv(J'*J + lambda*I)*J';
     qdot = inv(JDLS) * x;
     q(5) = [];
-
+    
     q = q + (qdot * dt)';
     
     % Update plot
@@ -84,7 +84,7 @@ while( toc < duration)
     pause(0.01);
     dobot.Animate(q);
     pause(0.01);
-        
+    
     % wait until loop time elapsed
     if (toc > dt*n)
         warning('Loop %i took too much time - consider increating dt',n);
