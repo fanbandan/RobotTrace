@@ -108,6 +108,12 @@ classdef Controller < handle
         function joints = GetDobotJoints(self)
             joints = self.RMRCI.GetRobotJoints();
         end
+        function qlim = GetDobotJointLimits(self)
+            qlim = self.RMRCI.GetRobotJointLimits();
+        end
+        function SetDobotJoints(self,q)
+            self.RMRCI.SetRobotJoints(q);            
+        end
     end
     methods
         % Debug / Visual methods
