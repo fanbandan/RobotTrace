@@ -36,8 +36,8 @@ function project_ros()
     %% Initialise ROS for Arduino eStop
     % rosrun rosserial_python serial_node.py /dev/tty<USB#> - For running
     % arduino serial node
-    sub = rossubscriber('/pushed');
-    pause(1);
+%     sub = rossubscriber('/pushed');
+%     pause(1);
     
     %Estop usage
 %     %Arduino eStop
