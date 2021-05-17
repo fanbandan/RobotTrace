@@ -22,7 +22,7 @@ classdef Dobot < RMRC.Robot
             a(3) = 0.135;
             % 0.147
             a(4) = 0.160;
-            a(5) = 0.2;
+            a(5) = 0.08;
             
             qlim(1,:) = [0,1];
             qlim(2,:) = deg2rad([-135   135]);
@@ -82,7 +82,7 @@ classdef Dobot < RMRC.Robot
                 q(4) = pi/2 - q(3) + q(4);
             else 
                 q = [q(1:4), 0, q(5)];
-%                 q(2) = -q(2);
+                q(2) = -q(2);
                 q(5) = pi - q(4);
                 q(4) = pi/2 - q(3) + q(4);
             end
@@ -97,7 +97,7 @@ classdef Dobot < RMRC.Robot
         end
         function Animate(self, q)
             q = [q(:,1:4), zeros(size(q,1),1), q(:,5)];
-%             q(:,2) = - q(:,2);
+            q(:,2) = - q(:,2);
             q(:,5) = pi - q(:,4);
             q(:,4) = pi/2 - q(:,3) + q(:,4);
             Animate@RMRC.Robot(self, q);
@@ -105,7 +105,7 @@ classdef Dobot < RMRC.Robot
         end
         function q = GetPos(self)
             q = self.Model.getpos();
-%             q(2) = -q(2);
+            q(2) = -q(2);
             q(4) = q(4) - pi/2 + q(3);
             q = [q(1:4), q(6)];
         end
