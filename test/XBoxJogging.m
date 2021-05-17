@@ -25,7 +25,7 @@ dt = 1;      % Set time step for simulation (seconds)
 
 n = 0;  % Initialise step count to zero
 tic;    % recording simulation start time
-while( toc < duration)
+while(toc < duration)
     
     n=n+1; % increment step count
     
@@ -61,9 +61,8 @@ while( toc < duration)
     
     % Update plot
     q = [q 0];
-    pause(0.01);
     dobot.Animate(q);
-    pause(0.01);
+    pause(0.005);
         
     % wait until loop time elapsed
     if (toc > dt*n)
