@@ -7,7 +7,7 @@ classdef EStop < handle
         timerPeriod = 0.1;
     end
     methods (Access = public)
-        function self = EStop(debug,RMRCI)
+        function self = EStop(RMRCI, debug)
             self.EStopSub = rossubscriber('/pushed');
             self.RMRCI = RMRCI;
             self.TimerSetup()

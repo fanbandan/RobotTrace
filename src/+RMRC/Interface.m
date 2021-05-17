@@ -36,7 +36,7 @@ classdef Interface < handle
             end
             if self.rosMode == true
                 self.dobotROS = DobotMagician();
-                self.eStop = RMRC.Estop();
+                self.eStop = RMRC.EStop(self,self.debug);
             else
                 self.simHandle = figure();
                 gca(self.simHandle);
