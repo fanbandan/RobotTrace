@@ -8,7 +8,7 @@ classdef Interface < handle
         CVI ComputerVision.Interface
         dobot RMRC.Dobot
         motion RMRC.ResMotion
-        eStop RMRC.Estop
+        eStop RMRC.EStop
         dobotROS DobotMagician
         deltaT double
         rosMode logical = true;

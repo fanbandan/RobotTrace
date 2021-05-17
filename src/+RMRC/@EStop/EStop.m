@@ -17,6 +17,8 @@ classdef EStop < handle
         end
         function delete(self)
             try
+                % Makes sure the class will destruct regardless of timer
+                % state
                 stop(self.timerObject);
                 delete(self.timerObject);
             end

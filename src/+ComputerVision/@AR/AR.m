@@ -16,8 +16,12 @@ classdef AR < handle
             end
         end
         function delete(self)
-            stop(self.timerObject);
-            delete(self.timerObject);
+            try
+                % Makes sure the class will destruct regardless of timer
+                % state
+                stop(self.timerObject);
+                delete(self.timerObject);
+            end
         end
         function arTags = UpdateARTags(self)
             tagMsg = receive(self.ARSub, 5); %Set to 5 second wait currently ----
