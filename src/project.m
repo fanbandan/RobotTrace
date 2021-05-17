@@ -2,7 +2,7 @@
     % Main File for launching project 2.
     %%
     rosinit
-    
+    %%
     rosMode = false;
     debug = false;    
     gui = GUI.GUI(rosMode, debug);

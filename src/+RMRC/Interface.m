@@ -29,6 +29,7 @@ classdef Interface < handle
             self.dobot = RMRC.Dobot();
             self.deltaT = deltaT;
             self.motion = RMRC.ResMotion(self.dobot, self.deltaT);
+            self.collision = RMRC.Collision(self.dobot);
             if exist('debug','var')
                 self.debug = debug;
             end
@@ -61,7 +62,7 @@ classdef Interface < handle
         function MoveRobot(self,qMatrix)
             for i = 1:size(qMatrix,1)                
                 if self.execute == true && self.initalised == true
-                    if self.collision.CheckCollition(qMatrix(i,:)) == true
+                    if self.collision.CheckCollision(qMatrix(i,:)) == true
                         self.Stop();
                     end
                     if self.rosMode == true
@@ -201,6 +202,9 @@ classdef Interface < handle
             set(self.arGameH,'Matrix',gameTF);
             set(self.arRobotH,'Matrix',robotTF);
             drawnow;       
+        end
+        function GenerateCollisionPoints(self)
+            self.collision.GeneratePlane();
         end
     end
 end

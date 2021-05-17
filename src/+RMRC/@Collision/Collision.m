@@ -13,6 +13,10 @@ classdef Collision < handle
             self.robot = robot;
         end
         function collision = CheckCollision(self, q)
+            if isempty(self.collisionPoints)
+                collision = false;
+                return
+            end
             [x(1),y(1),z(1)] = self.robot.LinkKinematics(q(1:1));
             [x(2),y(2),z(2)] = self.robot.LinkKinematics(q(1:2));
             [x(3),y(3),z(3)] = self.robot.LinkKinematics(q(1:3));
@@ -46,26 +50,16 @@ classdef Collision < handle
                 end
             end
         end
-        function GenerateCube(self, x, y, z)
+        function GeneratePlane(self)
             %% One side of the cube
-            [Y,Z] = meshgrid(-0.25:0.005:0.25,-0.25:0.005:0.25);
+            [X,Y] = meshgrid(-2:0.05:2,-2:0.05:2);
             sizeMat = size(Y);
-            X = repmat(0.25,sizeMat(1),sizeMat(2));
+            Z = 0*ones(size(Y));
             
             % Combine one surface as a point cloud
             cubePoints = [X(:),Y(:),Z(:)];
             
             % Make a cube by rotating the single side by 0,90,180,270, and around y to make the top and bottom faces
-            cubePoints = [ cubePoints ...
-                ; cubePoints * rotz(pi/2)...
-                ; cubePoints * rotz(pi) ...
-                ; cubePoints * rotz(3*pi/2) ...
-                ; cubePoints * roty(pi/2) ...
-                ; cubePoints * roty(-pi/2)];
-            hold on;
-            cubeAtOigin_h = plot3(cubePoints(:,1),cubePoints(:,2),cubePoints(:,3),'r.');
-            cubePoints = cubePoints + repmat([x,y,z],size(cubePoints,1),1);
-            cube_h = plot3(cubePoints(:,1),cubePoints(:,2),cubePoints(:,3),'b.');
             self.collisionPoints = cubePoints;
         end
         function algebraicDist = GetAlgebraicDist(self, points, centerPoint, radii)
