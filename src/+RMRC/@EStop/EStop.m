@@ -42,7 +42,7 @@ classdef EStop < handle
             start(self.timerObject);
         end
         function TimerUpdate(self)
-            self.UpdateARTags();
+            self.UpdateEStop();
         end
     end
 end
