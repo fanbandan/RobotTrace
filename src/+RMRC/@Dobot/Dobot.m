@@ -22,6 +22,7 @@ classdef Dobot < RMRC.Robot
             a(3) = 0.135;
             % 0.147
             a(4) = 0.160;
+            a(5) = 0.2;
             
             qlim(1,:) = [0,1];
             qlim(2,:) = deg2rad([-135   135]);
@@ -81,7 +82,7 @@ classdef Dobot < RMRC.Robot
                 q(4) = pi/2 - q(3) + q(4);
             else 
                 q = [q(1:4), 0, q(5)];
-                q(2) = -q(2);
+%                 q(2) = -q(2);
                 q(5) = pi - q(4);
                 q(4) = pi/2 - q(3) + q(4);
             end
@@ -89,17 +90,22 @@ classdef Dobot < RMRC.Robot
             % Display robot
             self.Model.plot(q,'tile1color',[1 1 1],'noarrow','workspace',workspace,'scale',0.25);
             self.Model.delay = 0.0;
+            if ~isempty(self.Item)
+                % Need to multiply by trotx(-pi) to undo the EE frame.
+                self.Item.Plot(self.Model.fkine(q)*self.ItemOffset*trotx(-pi));
+            end
         end
         function Animate(self, q)
             q = [q(:,1:4), zeros(size(q,1),1), q(:,5)];
-            q(:,2) = - q(:,2);
+%             q(:,2) = - q(:,2);
             q(:,5) = pi - q(:,4);
             q(:,4) = pi/2 - q(:,3) + q(:,4);
-            self.Model.animate(q);
+            Animate@RMRC.Robot(self, q);
+%             self.Model.animate(q);
         end
         function q = GetPos(self)
             q = self.Model.getpos();
-            q(2) = -q(2);
+%             q(2) = -q(2);
             q(4) = q(4) - pi/2 + q(3);
             q = [q(1:4), q(6)];
         end

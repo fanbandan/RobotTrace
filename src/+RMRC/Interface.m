@@ -18,9 +18,7 @@ classdef Interface < handle
         environmentObjects cell = cell(0);
         simHandle;
         pathHandle;
-        arGameTF;
         arGameH;
-        arRobotTF;
         arRobotH;
     end
     methods (Access = public)
@@ -125,25 +123,29 @@ classdef Interface < handle
             self.arGameH = hgtransform('Parent',ax);
             game = surf(x,y,z,'CData',arGameImage,'FaceColor','texturemap','EdgeColor','none');
             set(game,'Parent',self.arGameH);
-            self.arGameTF = transl(0,0,0.5);
-            set(self.arGameH,'Matrix',self.arGameTF);
+            arGameTF = transl(0,0,0.5);
+            set(self.arGameH,'Matrix',arGameTF);
             
             arRobotImage = imread([pwd, '//src//+RMRC//Environment//robot.PNG']);
             self.arRobotH = hgtransform('Parent',ax);
             game = surf(x,y,z,'CData',arRobotImage,'FaceColor','texturemap','EdgeColor','none');
             set(game,'Parent',self.arRobotH);
-            self.arRobotTF = transl(0.5,0,0.5);
-            set(self.arRobotH,'Matrix',self.arRobotTF);
+            arRobotTF = transl(0.5,0,0.5);
+            set(self.arRobotH,'Matrix',arRobotTF);
             drawnow;
               
+            EE = RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//endEffector.ply'],transl(0,0,0), [0.4 0.6 0.7]);
+            self.dobot.SetItem(EE, transl(0.075,0,0)*troty(pi)*trotx(pi/2)*trscale(0.1))
+%             self.environmentObjects{1} = EE;
+            
             Fence1 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,0.5,0.26), [0.4 0.6 0.7] );
-            self.environmentObjects{1} = Fence1;
+            self.environmentObjects{2} = Fence1;
             Fence2 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,-0.5,0.26), [0.4 0.6 0.7] );
-            self.environmentObjects{2} = Fence2;
+            self.environmentObjects{3} = Fence2;
             Table =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Table.ply'],transl(0.5,0,0), [1 0.3 0.1] );
-            self.environmentObjects{3} = Table;
+            self.environmentObjects{4} = Table;
             Camera =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//camera.ply'],transl(0.3,0.6,0.2)*trotx(pi/2), [0 0 1] );
-            self.environmentObjects{4} = Camera;
+            self.environmentObjects{5} = Camera;
             self.dobot.PlotRobot([-1,1,-1,1,0,1]);
             axis equal;
             view(ax,[30,30]);
@@ -157,6 +159,7 @@ classdef Interface < handle
         end
         function RenderPath(self)
             ax = gca(self.simHandle);
+            hold(ax, 'on');
 %             ax = gca(figure(3));
             try 
                 delete(self.pathHandle);
@@ -174,10 +177,8 @@ classdef Interface < handle
             zlabel(ax,"Z");
         end
         function ARRender(self, gameTF, robotTF)
-            self.arGameTF = gameTF;
-            self.arRobotTF = robotTF;
-            set(self.arGameH,'Matrix',self.arGameTF);
-            set(self.arRobotH,'Matrix',self.arRobotTF);
+            set(self.arGameH,'Matrix',gameTF);
+            set(self.arRobotH,'Matrix',robotTF);
             drawnow;       
         end
     end
