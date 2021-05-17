@@ -9,6 +9,7 @@ classdef Interface < handle
         dobot RMRC.Dobot
         motion RMRC.ResMotion
         eStop RMRC.EStop
+        collision RMRC.Collision
         dobotROS DobotMagician
         deltaT double
         rosMode logical = true;
@@ -34,6 +35,8 @@ classdef Interface < handle
             if exist('rosMode','var')
                 self.rosMode = rosMode;
             end
+            
+            self.eStop = RMRC.EStop(self,self.debug);
             if self.rosMode == true
                 self.dobotROS = DobotMagician();
                 self.eStop = RMRC.EStop(self,self.debug);
@@ -57,6 +60,9 @@ classdef Interface < handle
         end
         function MoveRobot(self,qMatrix)
             for i = 1:size(qMatrix,1)
+                
+                RMRC.CheckCollition(qMatrix(i));
+                
                 if self.execute == true && self.initalised == true      
                     if self.rosMode == true
                         joint_target = [qMatrix(i,2) qMatrix(i,3) qMatrix(i,4) qMatrix(i,5)];
@@ -84,6 +90,19 @@ classdef Interface < handle
                 q = [q1, q2'];
             else
                 q = self.dobot.GetPos();
+            end
+        end
+        function qlim = GetRobotJointLimits(self)
+            qlim = self.dobot.qlim;
+        end
+        function SetRobotJoints(self,q)
+            if self.rosMode == true
+                joint_target = [q(2) q(3) q(4) q(5)];
+                self.dobotROS.MoveRailToPosition(q(1));
+                self.dobotROS.PublishTargetJoint(joint_target);
+            else
+                self.dobot.Animate(q);
+                drawnow;
             end
         end
         function pose = GetRobotPose(self)
