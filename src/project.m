@@ -2,10 +2,7 @@
     % Main File for launching project 2.
     %%
     rosinit
-    % arduino serial node
-    sub = rossubscriber('/pushed');
-    pause(1);
-
+    
     rosMode = false;
     debug = false;    
     gui = GUI.GUI(rosMode, debug);

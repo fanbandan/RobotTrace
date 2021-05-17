@@ -8,6 +8,7 @@ classdef Interface < handle
         CVI ComputerVision.Interface
         dobot RMRC.Dobot
         motion RMRC.ResMotion
+        eStop RMRC.Estop
         dobotROS DobotMagician
         deltaT double
         rosMode logical = true;
@@ -35,6 +36,7 @@ classdef Interface < handle
             end
             if self.rosMode == true
                 self.dobotROS = DobotMagician();
+                self.eStop = RMRC.Estop();
             else
                 self.simHandle = figure();
                 gca(self.simHandle);
@@ -55,7 +57,7 @@ classdef Interface < handle
         end
         function MoveRobot(self,qMatrix)
             for i = 1:size(qMatrix,1)
-                if self.execute == true && self.initalised == true
+                if self.execute == true && self.initalised == true      
                     if self.rosMode == true
                         joint_target = [qMatrix(i,2) qMatrix(i,3) qMatrix(i,4) qMatrix(i,5)];
                         self.dobotROS.MoveRailToPosition(qMatrix(i,1));
