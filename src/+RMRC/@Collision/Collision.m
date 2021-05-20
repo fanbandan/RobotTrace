@@ -52,9 +52,9 @@ classdef Collision < handle
         end
         function GeneratePlane(self)
             %% One side of the cube
-            [X,Y] = meshgrid(-2:0.05:2,-2:0.05:2);
+            [X,Y] = meshgrid(-1:0.05:1,-1:0.05:1);
             sizeMat = size(Y);
-            Z = 0*ones(size(Y));
+            Z = -0.08*ones(size(Y));
             
             % Combine one surface as a point cloud
             cubePoints = [X(:),Y(:),Z(:)];
@@ -64,13 +64,9 @@ classdef Collision < handle
         end
         function algebraicDist = GetAlgebraicDist(self, points, centerPoint, radii)
             
-            figure(2);
-            clf;
-            hold on
-            cube_h = plot3(points(:,1),points(:,2),points(:,3),'b.');
             
-            [X,Y,Z] = ellipsoid(centerPoint(1),centerPoint(2),centerPoint(3),radii(1),radii(2),radii(3));
-            ellipsoidAtOrigin_h = surf(X,Y,Z);
+%             [X,Y,Z] = ellipsoid(centerPoint(1),centerPoint(2),centerPoint(3),radii(1),radii(2),radii(3));
+%             ellipsoidAtOrigin_h = surf(X,Y,Z);
             
             algebraicDist = ((points(:,1)-centerPoint(1))/radii(1)).^2 ...
                 + ((points(:,2)-centerPoint(2))/radii(2)).^2 ...
