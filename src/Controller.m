@@ -114,6 +114,16 @@ classdef Controller < handle
         function SetDobotJoints(self,q)
             self.RMRCI.SetRobotJoints(q);            
         end
+        function [x,y,z] = GetDobotPose(self)
+            pose = transl(self.RMRCI.GetRobotPose());
+            x = pose(1);
+            y = pose(2);
+            z = pose(3);
+        end
+        function [success, endPose] = JogDobot(self, x,y,z)
+            pose = transl(x,y,z);
+            [success, endPose] = self.RMRCI.MoveRobotToPose(pose);
+        end
     end
     methods
         % Debug / Visual methods

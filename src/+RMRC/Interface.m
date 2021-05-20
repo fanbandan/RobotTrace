@@ -37,7 +37,7 @@ classdef Interface < handle
                 self.rosMode = rosMode;
             end
             
-            self.eStop = RMRC.EStop(self,self.debug);
+%             self.eStop = RMRC.EStop(self,self.debug);
             if self.rosMode == true
                 self.dobotROS = DobotMagician();
                 self.eStop = RMRC.EStop(self,self.debug);
@@ -59,11 +59,13 @@ classdef Interface < handle
             end
             self.initalised = true;
         end
-        function MoveRobot(self,qMatrix)
+        function [success] = MoveRobot(self,qMatrix)
+            success = false;
             for i = 1:size(qMatrix,1)                
                 if self.execute == true && self.initalised == true
                     if self.collision.CheckCollision(qMatrix(i,:)) == true
                         self.Stop();
+                        return;
                     end
                     if self.rosMode == true
                         joint_target = [qMatrix(i,2) qMatrix(i,3) qMatrix(i,4) qMatrix(i,5)];
@@ -74,8 +76,11 @@ classdef Interface < handle
                         drawnow;
                     end
                     pause(self.deltaT);
+                else
+                    return
                 end
             end
+            success = true;
         end
         function Stop(self)
             self.execute = false;
@@ -111,6 +116,14 @@ classdef Interface < handle
             q = self.GetRobotJoints();
             pose = self.dobot.fkine(q);
         end
+        function [success,endPose] = MoveRobotToPose(self, pose)
+            q0 = self.GetRobotJoints();
+            q = self.dobot.ikcon(pose, q0);
+            qMatrix = jtraj(q0,q,10);
+            self.execute = true;
+            success = self.MoveRobot(qMatrix);
+            endPose = self.dobot.fkine(q);
+        end
         function UpdatePath(self, path)
             %UpdatePath - Updates the game path
             self.path = path;
@@ -138,6 +151,7 @@ classdef Interface < handle
             ax = gca(self.simHandle);
             surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
             hold(ax, 'on');
+            self.collision.GeneratePlane();
             
             h = 0.1;
             [x,z] = meshgrid(-h/2:h/4:h/2,-h/2:h/4:h/2);
