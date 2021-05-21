@@ -105,6 +105,9 @@ classdef Controller < handle
         function EStop(self)
             self.RMRCI.Stop();
         end
+        function ToggleCollisions(self, checkCollisions, renderCollisions)
+            self.RMRCI.ToggleCollisions(checkCollisions, renderCollisions);
+        end
         function joints = GetDobotJoints(self)
             joints = self.RMRCI.GetRobotJoints();
         end
