@@ -41,8 +41,7 @@ classdef Collision < handle
                 transformedPoints = collisionPointsAndOnes(:,1:3);
                 % find any points inside ellipsoid
                 algebraicDist = self.GetAlgebraicDist(transformedPoints, [0,0,0], radii(:,i));
-                pointsInside = find(algebraicDist < 1, 1);
-                if ~isempty(pointsInside)
+                if any(algebraicDist <= 1)
                     collision = true;
                     return;
                 end
@@ -61,7 +60,7 @@ classdef Collision < handle
                 z = 0;
             end
             
-            [X,Y] = meshgrid(-1:0.05:1,-1:0.05:1);
+            [X,Y] = meshgrid(-1:0.025:1,-1:0.025:1);
             Z = z*ones(size(Y));
             X = X+x;
             Y = Y+y;
@@ -92,17 +91,22 @@ classdef Collision < handle
                 % Transform points to ellipsoid coordinate frame
                 collisionPointsAndOnes = [inv(transforms(:,:,i)) * [self.collisionPoints,ones(size(self.collisionPoints,1),1)]']';
                 transformedPoints = collisionPointsAndOnes(:,1:3);
-                % find any points inside ellipsoid
-                algebraicDist = self.GetAlgebraicDist(transformedPoints, [0,0,0], radii(:,i));
-                pointsInside = find(algebraicDist <= 1, 1);
+                
+                % plot ellipsoid
                 [X,Y,Z] = ellipsoid(0,0,0,radii(1,i),radii(2,i),radii(3,i));
                 self.ellipsoidHandle(i) = surf(ax,X,Y,Z);
                 alpha(self.ellipsoidHandle(i), 0.6);
-                if ~isempty(pointsInside)
+                
+                % find any points inside ellipsoid
+                algebraicDist = self.GetAlgebraicDist(transformedPoints, [0,0,0], radii(:,i));
+                if any(algebraicDist <= 1)
                     set(self.ellipsoidHandle(i),'edgecolor','none','facecolor',[0.6350 0.0780 0.1840]);
                 else
                     set(self.ellipsoidHandle(i),'edgecolor','none','facecolor',[0.3010 0.7450 0.9330]);
                 end
+                
+                % tranform ellipsoid and colour based on collision
+                % detection
                 HG = hgtransform('Parent',ax);
                 set(self.ellipsoidHandle(i),'Parent',HG);
                 set(HG,'Matrix',transforms(:,:,i));
@@ -151,13 +155,15 @@ classdef Collision < handle
             
         end
         function algebraicDist = GetAlgebraicDist(self, points, centerPoint, radii)
-%             ax = gca(figure(8));
-%             cla(ax);
-%             hold(ax, 'on');
-%             axis equal
-%             [X,Y,Z] = ellipsoid(centerPoint(1),centerPoint(2),centerPoint(3),radii(1),radii(2),radii(3));
-%             surf(ax, X,Y,Z);
-%             scatter3(points(:,1),points(:,2),points(:,3),'.');
+            if self.debug == true
+                ax = gca(figure(8));
+                cla(ax);
+                hold(ax, 'on');
+                axis equal
+                [X,Y,Z] = ellipsoid(centerPoint(1),centerPoint(2),centerPoint(3),radii(1),radii(2),radii(3));
+                surf(ax, X,Y,Z);
+                scatter3(points(:,1),points(:,2),points(:,3),'.');
+            end
             
             algebraicDist = ((points(:,1)-centerPoint(1))/radii(1)).^2 ...
                           + ((points(:,2)-centerPoint(2))/radii(2)).^2 ...
