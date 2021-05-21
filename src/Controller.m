@@ -95,7 +95,7 @@ classdef Controller < handle
         function LoadTrajectory(self)
             pathPoses = zeros(4,4,size(self.pathPoints,2));
             for i = 1:size(self.pathPoints,2)
-                pathPoses(:,:,i) = transl(self.pathPoints(1,i),self.pathPoints(2,i),self.pathPoints(3,i));
+                pathPoses(:,:,i) = trotx(pi/2)*transl(self.pathPoints(1,i),self.pathPoints(2,i),self.pathPoints(3,i));
             end
             self.RMRCI.UpdatePath(pathPoses);
         end
