@@ -12,13 +12,13 @@ classdef EnvironmentObject < handle
     end
     
     methods
-        function self = EnvironmentObject(plyPath,pose,colour)
-            %EnviromentObject Construct an instance of this class
-            %   Detailed explanation goes here
-            
+        % Constructor requires the path to a 3d model, desired transform
+        % and colour
+        function self = EnvironmentObject(plyPath,pose,colour)           
             [self.TriMatrix,self.Verticies,data] = plyread(plyPath,'tri');
             self.Verticies = [self.Verticies, ones(length(self.Verticies),1)];
-            % Attempt to generate colour data.
+            % If colour data is available, use it, otherwise use input
+            % colour data
             if isfield(data.vertex, 'red')
                 self.Colours = [data.vertex.red, data.vertex.green, data.vertex.blue] / 255;                
             elseif isfield(data.face, 'red')
