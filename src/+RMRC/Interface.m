@@ -1,9 +1,6 @@
 classdef Interface < handle
-    %RMRC Interface - Interface for motion control of Dobot.
+    %   RMRC Interface - Interface for motion control of Dobot.
     %   Interface integrates collision detection, dobot, and RMRC movement.
-    properties (Access = public)
-        
-    end
     properties (Access = private)
         CVI ComputerVision.Interface
         dobot RMRC.Dobot
@@ -50,6 +47,7 @@ classdef Interface < handle
             delete(self.simHandle);
         end
         function Initialise(self)
+            % Initialise dobot
             if self.rosMode == true
                 self.dobotROS.InitaliseRobot();
                 self.dobotROS.SetRobotOnRail(true);
@@ -60,6 +58,7 @@ classdef Interface < handle
             self.initalised = true;
         end
         function [success] = MoveRobot(self,qMatrix)
+            % move robot from a provided qMatrix
             success = false;
             for i = 1:size(qMatrix,1)                
                 if self.execute == true && self.initalised == true
@@ -147,6 +146,8 @@ classdef Interface < handle
     end
     methods (Access = private)
         function GenerateSimEnvironment(self)
+            %Spawning in the required models in the required positions and
+            %orientations for the simulated environment
             figure(self.simHandle);
             ax = gca(self.simHandle);
             surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
@@ -195,6 +196,7 @@ classdef Interface < handle
             end
         end
         function RenderPath(self)
+            % Rendering path of dobot motion into the sim
             ax = gca(self.simHandle);
             hold(ax, 'on');
 %             ax = gca(figure(3));
@@ -214,6 +216,7 @@ classdef Interface < handle
             zlabel(ax,"Z");
         end
         function ARRender(self, gameTF, robotTF)
+            % Function to transform the AR tags
             set(self.arGameH,'Matrix',gameTF);
             set(self.arRobotH,'Matrix',robotTF);
             drawnow;       

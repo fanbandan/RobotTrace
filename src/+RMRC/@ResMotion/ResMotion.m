@@ -13,7 +13,7 @@ classdef ResMotion < handle
         deltaT                         % Control frequency
     end
     properties (Constant)
-        epsilon = 0.1
+        epsilon = 0.22
         WeightedMatrix = diag([1 1 1 0.1 0.1 0.1]); % Weighting matrix for the velocity vector
     end
     methods (Access = public)
@@ -22,49 +22,55 @@ classdef ResMotion < handle
             self.deltaT = deltaT;
         end
         function [qMatrix,positionError,angleError] = RateControl(self,x,q0)
+            % Setting variable sizing and default joint configuration
             steps = length(x);
-            m = zeros(steps,1);             % Array for Measure of Manipulability
-            qdot = zeros(steps,5);          % Array for joint velocities
-            qMatrix = zeros(steps,5);       % Array for joint anglesR
-            positionError = zeros(3,steps); % For plotting trajectory error
-            angleError = zeros(3,steps);    % For plotting trajectory error
+            m = zeros(steps,1);
+            qdot = zeros(steps,5);
+            qMatrix = zeros(steps,5);
+            positionError = zeros(3,steps);
+            angleError = zeros(3,steps);
             qMatrix(1,:) = q0;
             
             for i = 1:steps-1
-                T = self.robot.fkine(qMatrix(i,:));                                     % Get forward transformation at current joint state
-                deltaX = transl(x(:,:,i+1) - T);                                        % Get position error from next waypoint
+                % Current joint position
+                T = self.robot.fkine(qMatrix(i,:)); 
+                % translation error to next waypoint
+                deltaX = transl(x(:,:,i+1) - T);
+                % Current RPY
                 Rd = t2r(x(:,:,i+1));
-                %                 Rd = rpy2r(theta(1,i+1),theta(2,i+1),theta(3,i+1));   % Get next RPY angles, convert to rotation matrix
-                Ra = t2r(T);                                                            % Current end-effector rotation matrix
-                Rdot = (1/self.deltaT)*(Rd - Ra);                                       % Calculate rotation matrix error
+                %                 Rd = rpy2r(theta(1,i+1),theta(2,i+1),theta(3,i+1));
+                Ra = t2r(T);                                                         
+                % Rotation error to next waypoint
+                Rdot = (1/self.deltaT)*(Rd - Ra);
                 S = Rdot*Ra';                                                           % Matrix is skew symmetric
                 linear_velocity = (1/self.deltaT)*deltaX;
-                angular_velocity = [S(3,2);S(1,3);S(2,1)];                              % Check the structure of Skew Symmetric matrix!!
-                deltaTheta = tr2rpy(Rd*Ra');                                            % Convert rotation matrix to RPY angles
-                xdot = self.WeightedMatrix*[linear_velocity;angular_velocity];          % Calculate end-effector velocity to reach next waypoint.
-                J = self.robot.jacob(qMatrix(i,:));                                     % Get Jacobian at current joint state
+                angular_velocity = [S(3,2);S(1,3);S(2,1)];
+                % Velocity calculations
+                xdot = self.WeightedMatrix*[linear_velocity;angular_velocity];
+                J = self.robot.jacob(qMatrix(i,:));
+                % Check Manipulability
                 m(i) = sqrt(det(J*J'));
-                if m(i) < self.epsilon                                                  % If manipulability is less than given threshold
+                % Set lambda based of manipulability and the preset epsilon
+                if m(i) < self.epsilon
                     lambda = (1 - m(i)/self.epsilon)*5E-2;
                 else
                     lambda = 0;
                 end
-                invJ = inv(J'*J + lambda *eye(5))*J';                                   % DLS Inverse
-                qdot(i,:) = (invJ*xdot)';                                               % Solve the RMRC equation
-                for j = 1:5                                                             % Loop through joints 1 to 5
-                    if qMatrix(i,j) + self.deltaT*qdot(i,j) < self.robot.qlim(j,1)      % If next joint angle is lower than joint limit...
-                        qdot(i,j) = 0;                                                  % Stop the motor
-                    elseif qMatrix(i,j) + self.deltaT*qdot(i,j) > self.robot.qlim(j,2)  % If next joint angle is greater than joint limit ...
-                        qdot(i,j) = 0;                                                  % Stop the motor
+                
+                invJ = inv(J'*J + lambda *eye(5))*J';
+                %RMRC equation
+                qdot(i,:) = (invJ*xdot)';
+                %Account for joint limits
+                for j = 1:5
+                    if qMatrix(i,j) + self.deltaT*qdot(i,j) < self.robot.qlim(j,1)
+                        qdot(i,j) = 0;
+                    elseif qMatrix(i,j) + self.deltaT*qdot(i,j) > self.robot.qlim(j,2)
+                        qdot(i,j) = 0;
                     end
                 end
-                qMatrix(i+1,:) = qMatrix(i,:) + self.deltaT*qdot(i,:);                  % Update next joint state based on joint velocities
-                positionError(:,i) = transl(x(:,:,i+1) - T);                            % For plotting
-                angleError(:,i) = deltaTheta;                                           % For plotting
+                % Calculate joint angles
+                qMatrix(i+1,:) = qMatrix(i,:) + self.deltaT*qdot(i,:);
             end
         end
-    end
-    methods (Access = private)
-        
     end
 end
