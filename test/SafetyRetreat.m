@@ -32,7 +32,7 @@ for i = 1:noOfARPoses
     currentDistance = sqrt((xDobot - xAR)^2 + (yDobot - yAR)^2 + (zDobot - zAR)^2);
     plot3(xAR,yAR,zAR,'r*');
     
-    if (currentDistance < ARDist) && (TNewDobotPose(1,4) < 0.95)
+    if (currentDistance < ARDist) && (TDobot(1,4) < 0.95)
         disp("Retreating");
         
         % Calculate pose ARDist from the AR tag ----> (T)
@@ -46,7 +46,7 @@ for i = 1:noOfARPoses
         q0 = qNewDobotPose;
         TDobot = TNewDobotPose;
         
-    elseif (currentDistance < ARDist) && (TNewDobotPose(1,4) >= 0.95)
+    elseif (currentDistance < ARDist) && (TDobot(1,4) >= 0.95)
         disp("Reached end of rail");
         
         % Calculate pose ARDist from the AR tag ----> (T)
