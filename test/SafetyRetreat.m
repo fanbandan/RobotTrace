@@ -36,7 +36,7 @@ for i = 1:noOfARPoses
         disp("Retreating");
         
         % Calculate pose ARDist from the AR tag ----> (T)
-        TNewDobotPose = ARPose(:,:,i) * transl(0.1, 0, 0);
+        TNewDobotPose = ARPose(:,:,i) * transl(0.3, 0, 0);
         
         % Use dobot.ikcon(T, q0) to find joint pose q
         qNewDobotPose = dobot.ikcon(TNewDobotPose, q0);
@@ -50,7 +50,7 @@ for i = 1:noOfARPoses
         disp("Reached end of rail");
         
         % Calculate pose ARDist from the AR tag ----> (T)
-        TNewDobotPose = ARPose(:,:,i) * transl(0.1, 0, 0.1);
+        TNewDobotPose = ARPose(:,:,i) * transl(0.3, 0, 0.3);
         
         % Use dobot.ikcon(T, q0) to find joint pose q
         qNewDobotPose = dobot.ikcon(TNewDobotPose, q0);
