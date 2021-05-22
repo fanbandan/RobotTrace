@@ -14,7 +14,7 @@ classdef ResMotion < handle
     end
     properties (Constant)
         epsilon = 0.22
-        WeightedMatrix = diag([1 1 1 0.1 0.1 0.1]); % Weighting matrix for the velocity vector
+        WeightedMatrix = diag([[1 1 1] [1 1 1]]); % Weighting matrix for the velocity vector
     end
     methods (Access = public)
         function self = ResMotion(robot,deltaT)
@@ -31,6 +31,10 @@ classdef ResMotion < handle
             angleError = zeros(3,steps);
             qMatrix(1,:) = q0;
             
+            % hold on;
+%             trplot(x(:,:,1))
+%             trplot(x(:,:,end))
+            
             for i = 1:steps-1
                 % Current joint position
                 T = self.robot.fkine(qMatrix(i,:)); 
@@ -38,7 +42,6 @@ classdef ResMotion < handle
                 deltaX = transl(x(:,:,i+1) - T);
                 % Current RPY
                 Rd = t2r(x(:,:,i+1));
-                %                 Rd = rpy2r(theta(1,i+1),theta(2,i+1),theta(3,i+1));
                 Ra = t2r(T);                                                         
                 % Rotation error to next waypoint
                 Rdot = (1/self.deltaT)*(Rd - Ra);

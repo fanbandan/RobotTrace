@@ -86,7 +86,7 @@ classdef Interface < handle
             if self.rosMode == true
                 T = self.ar.GetRobotPose();
             else
-                T = trotz(pi)*trotx(pi/2)*transl(0.1,0.4,-1.5);
+                T = trotz(pi)*transl(0.2,1.55,0.3);
 %                 T = troty(-pi/2)*trotx(pi/2)*transl(0.4,0.2,0.8);
             end
         end

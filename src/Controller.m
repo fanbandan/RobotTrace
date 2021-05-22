@@ -95,7 +95,7 @@ classdef Controller < handle
         function LoadTrajectory(self)
             pathPoses = zeros(4,4,size(self.pathPoints,2));
             for i = 1:size(self.pathPoints,2)
-                pathPoses(:,:,i) = transl(self.pathPoints(1,i),self.pathPoints(2,i),self.pathPoints(3,i));
+                pathPoses(:,:,i) = trotx(pi/2)*transl(self.pathPoints(1,i),self.pathPoints(2,i),self.pathPoints(3,i));
             end
             self.RMRCI.UpdatePath(pathPoses);
         end
@@ -104,6 +104,9 @@ classdef Controller < handle
         end
         function EStop(self)
             self.RMRCI.Stop();
+        end
+        function ToggleCollisions(self, checkCollisions, renderCollisions)
+            self.RMRCI.ToggleCollisions(checkCollisions, renderCollisions);
         end
         function joints = GetDobotJoints(self)
             joints = self.RMRCI.GetRobotJoints();

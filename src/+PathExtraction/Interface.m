@@ -4,7 +4,7 @@ classdef Interface < handle
     %   Creates cartesian path from an image in path coordinate frame.
     properties (Access = public)
     end
-    properties 
+    properties (Access = private)
         Path PathExtraction.Path
         debug logical = false;
         

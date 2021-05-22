@@ -13,6 +13,8 @@ classdef Interface < handle
         debug logical = false;
         execute logical = false;
         initalised logical = false;
+        renderCollisions logical = false;
+        checkCollisions logical = true;
         path;
         environmentObjects cell = cell(0);
         simHandle;
@@ -34,7 +36,6 @@ classdef Interface < handle
                 self.rosMode = rosMode;
             end
             
-%             self.eStop = RMRC.EStop(self,self.debug);
             if self.rosMode == true
                 self.dobotROS = DobotMagician();
                 self.eStop = RMRC.EStop(self,self.debug);
@@ -48,12 +49,18 @@ classdef Interface < handle
         end
         function Initialise(self)
             % Initialise dobot
+            clf(self.simHandle);
+            gca(self.simHandle);
             if self.rosMode == true
                 self.dobotROS.InitaliseRobot();
                 self.dobotROS.SetRobotOnRail(true);
                 self.dobotROS.InitaliseRobot();
             else
                 self.GenerateSimEnvironment();
+            end
+            if self.renderCollisions == true
+                q = self.GetRobotJoints();
+                self.RenderCollisionEllipsoids(q);
             end
             self.initalised = true;
         end
@@ -62,9 +69,14 @@ classdef Interface < handle
             success = false;
             for i = 1:size(qMatrix,1)                
                 if self.execute == true && self.initalised == true
-                    if self.collision.CheckCollision(qMatrix(i,:)) == true
-                        self.Stop();
-                        return;
+                    if self.renderCollisions == true
+                        self.RenderCollisionEllipsoids(qMatrix(i,:));
+                    end
+                    if self.checkCollisions == true
+                        if self.collision.CheckCollision(qMatrix(i,:)) == true
+                            self.Stop();
+                            return;
+                        end
                     end
                     if self.rosMode == true
                         joint_target = [qMatrix(i,2) qMatrix(i,3) qMatrix(i,4) qMatrix(i,5)];
@@ -108,6 +120,9 @@ classdef Interface < handle
                 self.dobotROS.PublishTargetJoint(joint_target);
             else
                 self.dobot.Animate(q);
+                if self.renderCollisions == true
+                    self.RenderCollisionEllipsoids(q);
+                end
                 drawnow;
             end
         end
@@ -122,6 +137,16 @@ classdef Interface < handle
             self.execute = true;
             success = self.MoveRobot(qMatrix);
             endPose = self.dobot.fkine(q);
+        end
+        function ToggleCollisions(self, checkCollisions, renderCollisions)
+            self.checkCollisions = checkCollisions;
+            self.renderCollisions = renderCollisions;
+            if self.renderCollisions == true
+                q = self.GetRobotJoints();
+                self.RenderCollisionEllipsoids(q)
+            else
+                self.collision.ClearEllipsoid()
+            end
         end
         function UpdatePath(self, path)
             %UpdatePath - Updates the game path
@@ -152,39 +177,39 @@ classdef Interface < handle
             ax = gca(self.simHandle);
             surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
             hold(ax, 'on');
-            self.collision.GeneratePlane();
+            self.collision.GenerateBasePlane(0,0,-0.01);
             
-            h = 0.1;
-            [x,z] = meshgrid(-h/2:h/4:h/2,-h/2:h/4:h/2);
-            y = 0.01*ones(size(x));
-            arGameImage = imread([pwd, '//src//+RMRC//Environment//game.PNG']);
-            self.arGameH = hgtransform('Parent',ax);
-            game = surf(x,y,z,'CData',arGameImage,'FaceColor','texturemap','EdgeColor','none');
-            set(game,'Parent',self.arGameH);
-            arGameTF = transl(0,0,0.5);
-            set(self.arGameH,'Matrix',arGameTF);
+%             h = 0.1;
+%             [x,z] = meshgrid(-h/2:h/4:h/2,-h/2:h/4:h/2);
+%             y = 0.01*ones(size(x));
+%             arGameImage = imread([pwd, '//src//+RMRC//Environment//game.PNG']);
+%             self.arGameH = hgtransform('Parent',ax);
+%             game = surf(x,y,z,'CData',arGameImage,'FaceColor','texturemap','EdgeColor','none');
+%             set(game,'Parent',self.arGameH);
+%             arGameTF = transl(0,0,0.5);
+%             set(self.arGameH,'Matrix',arGameTF);
             
-            arRobotImage = imread([pwd, '//src//+RMRC//Environment//robot.PNG']);
-            self.arRobotH = hgtransform('Parent',ax);
-            game = surf(x,y,z,'CData',arRobotImage,'FaceColor','texturemap','EdgeColor','none');
-            set(game,'Parent',self.arRobotH);
-            arRobotTF = transl(0.5,0,0.5);
-            set(self.arRobotH,'Matrix',arRobotTF);
-            drawnow;
+%             arRobotImage = imread([pwd, '//src//+RMRC//Environment//robot.PNG']);
+%             self.arRobotH = hgtransform('Parent',ax);
+%             game = surf(x,y,z,'CData',arRobotImage,'FaceColor','texturemap','EdgeColor','none');
+%             set(game,'Parent',self.arRobotH);
+%             arRobotTF = transl(0.5,0,0.5);
+%             set(self.arRobotH,'Matrix',arRobotTF);
+%             drawnow;
               
             EE = RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//endEffector.ply'],transl(0,0,0), [0.4 0.6 0.7]);
             self.dobot.SetItem(EE, transl(0.075,0,0)*troty(pi)*trotx(pi/2)*trscale(0.1))
-%             self.environmentObjects{1} = EE;
             
             Fence1 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,0.5,0.26), [0.4 0.6 0.7] );
-            self.environmentObjects{2} = Fence1;
+            self.environmentObjects{1} = Fence1;
             Fence2 =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Fence2.ply'],transl(0.5,-0.5,0.26), [0.4 0.6 0.7] );
-            self.environmentObjects{3} = Fence2;
-            Table =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Table.ply'],transl(0.5,0,0), [1 0.3 0.1] );
-            self.environmentObjects{4} = Table;
+            self.environmentObjects{2} = Fence2;
+            Table =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//Table.ply'],transl(0.5,0,-0.02), [1 0.3 0.1] );
+            self.environmentObjects{3} = Table;
             Camera =  RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//camera.ply'],transl(0.3,0.6,0.2)*trotx(pi/2), [0 0 1] );
-            self.environmentObjects{5} = Camera;
-            self.dobot.PlotRobot([-1,1,-1,1,0,1]);
+            self.environmentObjects{4} = Camera;
+            
+            self.dobot.PlotRobot([-1,1,-1,1,-0.24,1]);
             axis equal;
             view(ax,[30,30]);
         end
@@ -199,7 +224,6 @@ classdef Interface < handle
             % Rendering path of dobot motion into the sim
             ax = gca(self.simHandle);
             hold(ax, 'on');
-%             ax = gca(figure(3));
             try 
                 delete(self.pathHandle);
             end
@@ -214,6 +238,11 @@ classdef Interface < handle
             xlabel(ax,"X");
             ylabel(ax,"Y");
             zlabel(ax,"Z");
+        end
+        function RenderCollisionEllipsoids(self,q)
+            ax = gca(self.simHandle);
+            hold(ax, 'on');
+            self.collision.ShowEllpsoid(ax, q)
         end
         function ARRender(self, gameTF, robotTF)
             % Function to transform the AR tags
