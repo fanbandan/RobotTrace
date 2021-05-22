@@ -4,7 +4,6 @@ clf;
 
 % Set/Create Parameters
 intersect = false;
-noOfPlane = 6;
 noOfTrajPoints = 100;
 intersectionPoint = [0 0 0];
 
@@ -18,7 +17,7 @@ q0 = qn;
 hold on;
 
 %% Create a plane
-planePoint = [0.9; 0; 0];
+planePoint = [0.5; 0; 0];
 planeNormal = [0.1; 0; 0];
 normal = [0.1, 0, 0];
 
