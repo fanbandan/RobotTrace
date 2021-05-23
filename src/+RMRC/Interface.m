@@ -178,24 +178,6 @@ classdef Interface < handle
             surf(ax, [-1.8,-1.8;1.8,1.8],[-1.8,1.8;-1.8,1.8],[-0.01,0.01;0.01,0.01]-0.23,'CData',imread([pwd, '//src//+RMRC//Environment//concrete.jpg']),'FaceColor','texturemap'); 
             hold(ax, 'on');
             self.collision.GenerateBasePlane(0,0,-0.01);
-            
-%             h = 0.1;
-%             [x,z] = meshgrid(-h/2:h/4:h/2,-h/2:h/4:h/2);
-%             y = 0.01*ones(size(x));
-%             arGameImage = imread([pwd, '//src//+RMRC//Environment//game.PNG']);
-%             self.arGameH = hgtransform('Parent',ax);
-%             game = surf(x,y,z,'CData',arGameImage,'FaceColor','texturemap','EdgeColor','none');
-%             set(game,'Parent',self.arGameH);
-%             arGameTF = transl(0,0,0.5);
-%             set(self.arGameH,'Matrix',arGameTF);
-            
-%             arRobotImage = imread([pwd, '//src//+RMRC//Environment//robot.PNG']);
-%             self.arRobotH = hgtransform('Parent',ax);
-%             game = surf(x,y,z,'CData',arRobotImage,'FaceColor','texturemap','EdgeColor','none');
-%             set(game,'Parent',self.arRobotH);
-%             arRobotTF = transl(0.5,0,0.5);
-%             set(self.arRobotH,'Matrix',arRobotTF);
-%             drawnow;
               
             EE = RMRC.EnvironmentObject([pwd, '//src//+RMRC//Environment//endEffector.ply'],transl(0,0,0), [0.4 0.6 0.7]);
             self.dobot.SetItem(EE, transl(0.075,0,0)*troty(pi)*trotx(pi/2)*trscale(0.1))

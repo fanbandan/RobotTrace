@@ -130,7 +130,6 @@ classdef Collision < handle
             
             for i = 1:size(q,2)
                 [x(i),y(i),z(i)] = self.robot.LinkKinematics(q(1:i));
-%                 trplot(transl(x(i),y(i),z(i)),'length',0.2)
             end
             
             links = length(x) - 1;

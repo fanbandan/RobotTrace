@@ -193,12 +193,6 @@ classdef Dobot < RMRC.Robot
             end
         end
         function J = jacob(self, q)
-            
-%             [valid,q] = self.verifyQ(q);
-%             if ~valid
-%                 warn('q value outside q limits, defaulting to nearest limit');
-%             end
-            
             l = self.a(3)*sin(q(3)) + self.a(4)*cos(q(4)) + self.a(5);
             
             J = zeros(6,5);

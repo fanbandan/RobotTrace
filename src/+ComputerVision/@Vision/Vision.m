@@ -49,16 +49,11 @@ classdef Vision < handle
             
             % Set background pixels where BW is false to zero.
             maskedRGBImage(repmat(~BW,[1 1 3])) = 0;
-%             if self.Debug == true
-%                 imshow(maskedRGBImage);
-%             end
+
         end        
         function edgeImage = edgeDetection(image)
             %Canny Edge Detection
             edgeImage = edge(image(:,:,3),'canny');
-%             if self.Debug == true
-%                 imshow(edgeImage);
-%             end
         end
     end
 end
