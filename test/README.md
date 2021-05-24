@@ -1,1 +1,3 @@
-Tests to go here time permitting.
+# Tests
+
+This folder contains early development code and class test functions.
