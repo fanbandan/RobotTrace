@@ -23,7 +23,7 @@ classdef Vision < handle
     methods (Static)
         function maskedRGBImage = colourMask(image)
             
-            % Convert RGB image to chosen color space
+            % Convert RGB image to HSV color space
             I = rgb2hsv(image);
             
             % Define thresholds for channel 1 based on histogram settings
@@ -50,9 +50,9 @@ classdef Vision < handle
             % Set background pixels where BW is false to zero.
             maskedRGBImage(repmat(~BW,[1 1 3])) = 0;
 
-        end        
-        function edgeImage = edgeDetection(image)
-            %Canny Edge Detection
+        end   
+        %edgeDetection reutrns a Canny Edge Detected image     
+        function edgeImage = edgeDetection(image) 
             edgeImage = edge(image(:,:,3),'canny');
         end
     end

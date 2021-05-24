@@ -32,10 +32,12 @@ classdef Interface < handle
             %   [0] pixel at uv coordinate does not contain copper pipe.
             image = self.GetImage();
             maskedRGBImage = ComputerVision.Vision.colourMask(image);
+            % Depending on the image, canny edge detection can be used for cleaner results
 %             edgeImage = ComputerVision.Vision.edgeDetection(maskedRGBImage);
             edgeImage = maskedRGBImage(:,:,3);            
             BWImage = edgeImage;
         end
+        %GetCameraMatrix returns calibration matrix for laptop webcam
         function [cameraMatrix] = GetCameraMatrix(self)
             cameraMatrix = [ ...
                 665.578756,    0,          282.225564; ...
@@ -43,6 +45,7 @@ classdef Interface < handle
                 0,              0,          1; ...
                 ];
         end
+        %GetGamePlane returns the plane that the game sits on
         function [normal, point] = GetGamePlane(self, zDepthOverride)
             game = self.GetCamera2GameTransformationMatrix();
             position = transl(game);
@@ -54,6 +57,7 @@ classdef Interface < handle
             point = point';
             normal = orientation';
         end
+        %UpdateARTags gets the updated current position of the AR tags
         function UpdateARTags(self)
             if self.rosMode == true
                 self.ar.UpdateARTags();
